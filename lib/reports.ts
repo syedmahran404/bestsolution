@@ -10,6 +10,7 @@ import "server-only";
 
 import { COLLECTIONS } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { aggregateReport, type AggregationResult } from "@/lib/aggregation";
 import type { CreateReportInput } from "@/lib/validation/report";
 import type { CivicReport } from "@/types";
 
@@ -30,11 +31,29 @@ export async function createReport(
     latitude: input.latitude,
     longitude: input.longitude,
     status: "reported",
+    civicCaseId: null,
     createdAt: new Date().toISOString(),
   };
 
   await ref.set(report);
   return report;
+}
+
+/**
+ * Create a report AND run the aggregation engine (Phase 3): the report is
+ * linked to a new or existing civic case. Returns the linked report plus the
+ * aggregation outcome.
+ */
+export async function submitReport(input: CreateReportInput): Promise<{
+  report: CivicReport;
+  aggregation: AggregationResult;
+}> {
+  const report = await createReport(input);
+  const aggregation = await aggregateReport(report);
+  return {
+    report: { ...report, civicCaseId: aggregation.civicCaseId },
+    aggregation,
+  };
 }
 
 /** List reports, newest first. */

@@ -1,34 +1,64 @@
 import { SiteHeader } from "@/components/site-header";
 import { CivicMap } from "@/components/map/civic-map";
-import { Card } from "@/components/ui/card";
-import { STATUS_META } from "@/lib/constants";
+import { AggregationMetrics } from "@/components/aggregation-metrics";
+import { CivicCaseCard } from "@/components/cases/civic-case-card";
+import { CATEGORY_META } from "@/lib/constants";
+import { computeAggregationMetrics } from "@/lib/aggregation";
+import { listCivicCases } from "@/lib/civic-cases";
+import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { SEED_ISSUES } from "@/lib/seed-data";
+import type { CivicCase, CivicMapMarker } from "@/types";
+
+// Reads live civic cases from Firestore — never statically cache.
+export const dynamic = "force-dynamic";
 
 /**
- * Phase 1 landing page — the Civic Operations Center shell.
+ * Civic Operations Center home.
  *
- * Server component: computes lightweight stats from the seeded dataset and
- * renders the interactive India map (client). Live Firestore data replaces the
- * seed source in later phases without changing this layout.
+ * Renders the India map fed by aggregated civic cases (Phase 3). When Firebase
+ * is not configured, it falls back to the Phase 1 seed dataset so the map and
+ * legend still work (no regression).
  */
-export default function HomePage() {
-  const issues = SEED_ISSUES;
+export default async function HomePage() {
+  let cases: CivicCase[] = [];
+  if (isFirebaseAdminConfigured) {
+    try {
+      cases = await listCivicCases();
+    } catch (err) {
+      console.error("[home] failed to load civic cases:", err);
+    }
+  }
 
-  const stats = {
-    total: issues.length,
-    open: issues.filter((i) => STATUS_META[i.status].group === "open").length,
-    progress: issues.filter((i) => STATUS_META[i.status].group === "progress")
-      .length,
-    resolved: issues.filter((i) => STATUS_META[i.status].group === "resolved")
-      .length,
-  };
+  const usingLiveData = cases.length > 0;
 
-  const statCards = [
-    { label: "Total Issues", value: stats.total, hex: "#0f172a" },
-    { label: "Open", value: stats.open, hex: "#ef4444" },
-    { label: "In Progress", value: stats.progress, hex: "#f59e0b" },
-    { label: "Resolved", value: stats.resolved, hex: "#22c55e" },
-  ];
+  const markers: CivicMapMarker[] = usingLiveData
+    ? cases.map((c) => ({
+        id: c.id,
+        title: CATEGORY_META[c.category].label,
+        category: c.category,
+        status: c.status,
+        lat: c.centerLocation.lat,
+        lng: c.centerLocation.lng,
+        reportCount: c.reportCount,
+        href: `/cases/${c.id}`,
+      }))
+    : SEED_ISSUES.map((i) => ({
+        id: i.id,
+        title: i.title,
+        category: i.category,
+        status: i.status,
+        lat: i.location.lat,
+        lng: i.location.lng,
+        reportCount: 1,
+      }));
+
+  const metrics = usingLiveData
+    ? computeAggregationMetrics(cases)
+    : {
+        totalReports: SEED_ISSUES.length,
+        totalCases: SEED_ISSUES.length,
+        avgReportsPerCase: 1,
+      };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -40,39 +70,38 @@ export default function HomePage() {
             India Civic Operations Center
           </h1>
           <p className="text-sm text-muted-foreground">
-            Live view of reported civic issues across India. Explore, zoom, and
-            track resolution status.
+            Citizen reports are automatically aggregated into civic cases.
+            Explore them on the map and track resolution status.
+            {!usingLiveData && " (Showing demo data.)"}
           </p>
         </section>
 
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {statCards.map((s) => (
-            <Card key={s.label} className="p-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: s.hex }}
-                />
-                <p className="text-xs font-medium text-muted-foreground">
-                  {s.label}
-                </p>
-              </div>
-              <p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p>
-            </Card>
-          ))}
-        </section>
+        <AggregationMetrics {...metrics} />
 
-        <section className="min-h-[480px] flex-1">
-          <div className="h-[60vh] min-h-[480px] w-full">
-            <CivicMap issues={issues} />
+        <section className="min-h-[480px]">
+          <div className="h-[58vh] min-h-[440px] w-full">
+            <CivicMap markers={markers} />
           </div>
         </section>
+
+        {usingLiveData && (
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold tracking-tight">
+              Civic cases
+            </h2>
+            <div className="space-y-3">
+              {cases.slice(0, 10).map((c) => (
+                <CivicCaseCard key={c.id} civicCase={c} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="border-t py-4">
         <div className="container text-center text-xs text-muted-foreground">
-          Velora Civic AI · Built for the Vibe2Ship Hackathon · Phase 1
-          Foundation
+          Velora Civic AI · Built for the Vibe2Ship Hackathon · Phase 3
+          Aggregation Engine
         </div>
       </footer>
     </div>

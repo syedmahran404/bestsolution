@@ -99,8 +99,72 @@ export interface CivicReport {
   /** Lifecycle status — always "reported" at creation in Phase 2. */
   status: IssueStatus;
 
+  /** Linked civic case id (set by the Phase 3 aggregation engine). */
+  civicCaseId?: string | null;
+
   /** ISO creation timestamp. */
   createdAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                Civic Case                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * An aggregated civic case (Phase 3 — the Aggregation Engine).
+ *
+ * Many related reports (same category, geographically close) are collapsed
+ * into one CivicCase. A case may contain a single report (reportCount === 1)
+ * or many. Stored in the `civicCases` collection.
+ *
+ * Relationship: one CivicCase ── has many ──> reports (via reportIds, and
+ * each report stores its civicCaseId).
+ */
+export interface CivicCase {
+  /** Firestore document id. */
+  id: string;
+
+  /** Category shared by all member reports. */
+  category: IssueCategory;
+
+  /** Running centroid of all member report coordinates. */
+  centerLocation: {
+    lat: number;
+    lng: number;
+  };
+
+  /** Number of reports aggregated into this case. */
+  reportCount: number;
+
+  /** Lifecycle status of the consolidated case. */
+  status: IssueStatus;
+
+  /** Ids of the member reports. */
+  reportIds: string[];
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Map marker                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Unified marker shape consumed by the CivicMap. A marker with reportCount > 1
+ * is rendered as an aggregated civic-case bubble; reportCount === 1 renders as
+ * a single teardrop pin.
+ */
+export interface CivicMapMarker {
+  id: string;
+  title: string;
+  category: IssueCategory;
+  status: IssueStatus;
+  lat: number;
+  lng: number;
+  reportCount: number;
+  /** Optional link target (e.g. the civic case detail page). */
+  href?: string;
 }
 
 /* -------------------------------------------------------------------------- */

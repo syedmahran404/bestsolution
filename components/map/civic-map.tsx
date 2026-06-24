@@ -9,14 +9,10 @@ import {
 } from "@vis.gl/react-google-maps";
 
 import { CATEGORY_META, INDIA_MAP_CONFIG, STATUS_META } from "@/lib/constants";
-import type { Issue } from "@/types";
+import type { CivicMapMarker } from "@/types";
 import { MapLegend } from "@/components/map/map-legend";
 
-/**
- * Build a colored teardrop pin as an inline SVG data-URI.
- * Avoids depending on the google.maps namespace at render time, so markers
- * render reliably with just an API key (no vector Map ID required).
- */
+/** Colored teardrop pin (single report) as an inline SVG data-URI. */
 function pinIcon(hex: string): string {
   const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
@@ -26,17 +22,29 @@ function pinIcon(hex: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-interface CivicMapProps {
-  issues: Issue[];
+/** Aggregated civic-case bubble with the report count drawn inside the SVG. */
+function bubbleIcon(hex: string, count: number): string {
+  const label = count > 99 ? "99+" : String(count);
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+  <circle cx="22" cy="22" r="20" fill="${hex}" stroke="#ffffff" stroke-width="3"/>
+  <text x="22" y="27" text-anchor="middle" font-family="Arial, sans-serif"
+    font-size="16" font-weight="700" fill="#ffffff">${label}</text>
+</svg>`.trim();
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-export function CivicMap({ issues }: CivicMapProps) {
+interface CivicMapProps {
+  markers: CivicMapMarker[];
+}
+
+export function CivicMap({ markers }: CivicMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selected = useMemo(
-    () => issues.find((i) => i.id === selectedId) ?? null,
-    [issues, selectedId],
+    () => markers.find((m) => m.id === selectedId) ?? null,
+    [markers, selectedId],
   );
 
   // Graceful degradation: no key → informative placeholder (build still works).
@@ -49,8 +57,8 @@ export function CivicMap({ issues }: CivicMapProps) {
           <code className="rounded bg-muted px-1 py-0.5">
             NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
           </code>{" "}
-          to load the interactive India map. {issues.length} demo civic issues
-          are ready to display.
+          to load the interactive India map. {markers.length} civic
+          case(s)/report(s) ready to display.
         </p>
         <MapLegend />
       </div>
@@ -72,33 +80,36 @@ export function CivicMap({ issues }: CivicMapProps) {
           fullscreenControl={false}
           className="h-full w-full"
         >
-          {issues.map((issue) => (
-            <Marker
-              key={issue.id}
-              position={{ lat: issue.location.lat, lng: issue.location.lng }}
-              title={issue.title}
-              icon={pinIcon(STATUS_META[issue.status].hex)}
-              onClick={() => setSelectedId(issue.id)}
-            />
-          ))}
+          {markers.map((marker) => {
+            const hex = STATUS_META[marker.status].hex;
+            const aggregated = marker.reportCount > 1;
+            return (
+              <Marker
+                key={marker.id}
+                position={{ lat: marker.lat, lng: marker.lng }}
+                title={marker.title}
+                icon={
+                  aggregated
+                    ? bubbleIcon(hex, marker.reportCount)
+                    : pinIcon(hex)
+                }
+                onClick={() => setSelectedId(marker.id)}
+              />
+            );
+          })}
 
           {selected && (
             <InfoWindow
-              position={{
-                lat: selected.location.lat,
-                lng: selected.location.lng,
-              }}
+              position={{ lat: selected.lat, lng: selected.lng }}
               onCloseClick={() => setSelectedId(null)}
             >
-              <div className="max-w-[220px] space-y-1 p-1">
+              <div className="max-w-[240px] space-y-1 p-1">
                 <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
                   <span>{CATEGORY_META[selected.category].glyph}</span>
                   <span>{selected.title}</span>
                 </div>
-                <p className="text-xs text-slate-600">
-                  {selected.location.address ?? selected.location.city}
-                </p>
-                <div className="flex items-center gap-2 pt-1">
+
+                <div className="flex items-center gap-2 pt-0.5">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-full"
                     style={{
@@ -109,9 +120,26 @@ export function CivicMap({ issues }: CivicMapProps) {
                     {STATUS_META[selected.status].label}
                   </span>
                   <span className="text-xs text-slate-500">
-                    · severity {selected.severityScore}
+                    · {CATEGORY_META[selected.category].label}
                   </span>
                 </div>
+
+                {selected.reportCount > 1 ? (
+                  <p className="text-xs font-medium text-slate-700">
+                    Aggregated civic case · {selected.reportCount} reports
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500">Single report</p>
+                )}
+
+                {selected.href && (
+                  <a
+                    href={selected.href}
+                    className="inline-block pt-1 text-xs font-semibold text-blue-600 underline-offset-2 hover:underline"
+                  >
+                    View civic case →
+                  </a>
+                )}
               </div>
             </InfoWindow>
           )}

@@ -8,6 +8,34 @@ Velora is not a complaint form. It is an AI-powered civic intelligence platform 
 
 ---
 
+## Status: Phase 3 — Aggregation Engine ✅
+
+The core differentiator: many individual reports are automatically collapsed
+into consolidated **civic cases** using **deterministic geospatial clustering**
+(no AI, no embeddings).
+
+- **Duplicate detection / clustering**: a new report is attached to the nearest
+  existing case of the **same category** within `AGGREGATION_RADIUS_M` (150m,
+  via `geolib` haversine distance); otherwise a new case is created.
+- **`CivicCase` entity** (`civicCases` collection): `id, category,
+centerLocation, reportCount, status, reportIds, createdAt, updatedAt`. The
+  centroid is maintained as a running average.
+- **Relationship**: one `CivicCase` ── has many ──> `reports`
+  (each report stores its `civicCaseId`).
+- **Map visualization**: aggregated cases render as numbered bubbles; single
+  reports render as teardrop pins (clear visual distinction).
+- **Case detail screen** (`/cases/[id]`): category, report count, status,
+  member locations (mini-map), and linked reports — read-only.
+- **Aggregation metrics** on the home page: total reports, total civic cases,
+  average reports per case.
+- **API**: `GET /api/cases`, `GET /api/cases/[id]`. Report creation
+  (`POST /api/reports`) now runs the aggregation engine automatically.
+
+> No AI, severity scoring, department routing, resolution, or admin yet —
+> those are Phases 4–5.
+
+---
+
 ## Status: Phase 2 — Citizen Reporting System ✅
 
 Builds on the Phase 1 foundation. Citizens can now submit civic reports.
