@@ -1,16 +1,17 @@
+import Link from "next/link";
 import { Activity } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 /**
  * Top navigation bar for the Civic Operations Center.
- * Phase 1: brand + positioning only. Nav links arrive in later phases.
+ * Brand + primary navigation (Map / Report / My Reports).
  */
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2.5">
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Activity className="h-5 w-5" />
           </div>
@@ -18,14 +19,23 @@ export function SiteHeader() {
             <p className="text-base font-semibold tracking-tight">
               Velora Civic AI
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="hidden text-xs text-muted-foreground sm:block">
               AI Civic Operations Center
             </p>
           </div>
-        </div>
-        <Badge variant="secondary" className="hidden sm:inline-flex">
-          From Reporting to Resolution
-        </Badge>
+        </Link>
+
+        <nav className="flex items-center gap-1">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/">Map</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/reports">My Reports</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/report">Report issue</Link>
+          </Button>
+        </nav>
       </div>
     </header>
   );

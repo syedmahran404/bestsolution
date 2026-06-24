@@ -60,6 +60,50 @@ export interface GeoLocation {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                              Citizen Report                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A citizen-submitted report (Phase 2 — Citizen Reporting System).
+ *
+ * Stored in the `reports` Firestore collection. This is the raw submission
+ * captured from a citizen BEFORE any AI processing (Phase 3+ enriches it into
+ * the richer `Issue` model). The flat lat/lng + url shape matches the Phase 2
+ * schema and keeps Storage/Firestore writes simple.
+ */
+export interface CivicReport {
+  /** Firestore document id. */
+  id: string;
+
+  /** Short title of the problem. */
+  title: string;
+
+  /** Citizen-provided description. */
+  description: string;
+
+  /** Selected category. */
+  category: IssueCategory;
+
+  /** Public Firebase Storage URL of the uploaded photo, if any. */
+  imageUrl: string | null;
+
+  /** Public Firebase Storage URL of the recorded/uploaded voice note, if any. */
+  audioUrl: string | null;
+
+  /** Captured latitude. */
+  latitude: number;
+
+  /** Captured longitude. */
+  longitude: number;
+
+  /** Lifecycle status — always "reported" at creation in Phase 2. */
+  status: IssueStatus;
+
+  /** ISO creation timestamp. */
+  createdAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                   Issue                                    */
 /* -------------------------------------------------------------------------- */
 

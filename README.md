@@ -8,6 +8,41 @@ Velora is not a complaint form. It is an AI-powered civic intelligence platform 
 
 ---
 
+## Status: Phase 2 — Citizen Reporting System ✅
+
+Builds on the Phase 1 foundation. Citizens can now submit civic reports.
+
+- **Report form** (`/report`): title, description, category, photo upload, voice
+  note (record or upload), and location (one-tap Geolocation + manual fallback)
+- **Voice recording** via the open-source `react-audio-voice-recorder`
+- **Image + audio** uploaded to **Firebase Storage**; URLs persisted in Firestore
+- **Validation** with **Zod** + **React Hook Form** (shared client/server schema)
+- **API**: `POST /api/reports` (create) and `GET /api/reports` (list) — Next.js
+  Route Handlers writing via the Firebase Admin SDK
+- **My Reports** (`/reports`): lists submitted reports with status, category,
+  location, and timestamp
+- New `reports` Firestore collection: `id, title, description, category,
+imageUrl, audioUrl, latitude, longitude, status, createdAt`
+
+> No AI, aggregation, severity, department routing, or admin yet — those are
+> Phases 3–5.
+
+### Required Firebase rules (demo)
+
+Client-side uploads/reads need permissive rules for the hackathon demo. In
+**Firestore** and **Storage**, allow the `reports` paths (tighten with Auth
+later):
+
+```
+// Storage
+match /reports/{allPaths=**} { allow read, write: if true; }
+```
+
+The `reports` collection is written server-side via the Admin SDK (bypasses
+Firestore rules), and read on the server for "My Reports".
+
+---
+
 ## Status: Phase 1 — Foundation & Infrastructure ✅
 
 This phase delivers a production-ready foundation only (no AI logic yet):
