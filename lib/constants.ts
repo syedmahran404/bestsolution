@@ -75,4 +75,5 @@ export const COLLECTIONS = {
   issues: "issues",
   clusters: "clusters",
   departments: "departments",
+  reports: "reports",
 } as const;
