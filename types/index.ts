@@ -44,6 +44,36 @@ export type SeverityLabel = "low" | "medium" | "high" | "critical";
 export type ReportInputType = "photo" | "voice";
 
 /* -------------------------------------------------------------------------- */
+/*                               AI Analysis                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Structured AI analysis of a report (Phase 4 — Civic Intelligence Layer).
+ *
+ * Produced by a single Gemini call at submit time. Stored on the report so it
+ * is generated exactly once (immutable cache — never re-called). Reasoning is
+ * always surfaced in the UI: no black-box AI.
+ */
+export interface AIAnalysis {
+  /** AI-predicted category (may differ from the citizen's selection). */
+  category: IssueCategory;
+  /** Model confidence, 0-1. */
+  confidence: number;
+  /** Human-readable explanation of the classification. */
+  reasoning: string;
+  /** Signal keywords the model detected. */
+  keywords: string[];
+  /** Concise one-line summary of the issue. */
+  summary: string;
+  /** Voice transcript (null when there is no audio / transcription failed). */
+  transcript: string | null;
+  /** Model used (e.g. gemini-2.5-flash). */
+  model: string;
+  /** ISO timestamp of generation. */
+  generatedAt: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                 Geography                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -102,6 +132,9 @@ export interface CivicReport {
   /** Linked civic case id (set by the Phase 3 aggregation engine). */
   civicCaseId?: string | null;
 
+  /** AI analysis (Phase 4). Null until analyzed / when Gemini is unconfigured. */
+  aiAnalysis?: AIAnalysis | null;
+
   /** ISO creation timestamp. */
   createdAt: string;
 }
@@ -141,6 +174,18 @@ export interface CivicCase {
 
   /** Ids of the member reports. */
   reportIds: string[];
+
+  /**
+   * AI-generated case summary (Phase 4). Cached on the document and keyed by
+   * aiSummaryReportCount so it is only regenerated when the case grows.
+   */
+  aiSummary?: string | null;
+  /** AI-generated community impact summary (Phase 4). */
+  aiImpact?: string | null;
+  /** reportCount at which the AI summary was generated (cache key). */
+  aiSummaryReportCount?: number | null;
+  /** ISO timestamp of AI summary generation. */
+  aiGeneratedAt?: string | null;
 
   createdAt: string;
   updatedAt: string;

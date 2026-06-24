@@ -45,8 +45,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { report, aggregation } = await submitReport(parsed.data);
-    return NextResponse.json({ report, aggregation }, { status: 201 });
+    const { report, aggregation, analysis } = await submitReport(parsed.data);
+    return NextResponse.json(
+      { report, aggregation, analysis },
+      { status: 201 },
+    );
   } catch (err) {
     console.error("[api/reports] create failed:", err);
     return NextResponse.json(

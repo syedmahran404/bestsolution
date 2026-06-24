@@ -3,6 +3,7 @@ import { FilePlus2, Inbox } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { ReportCard } from "@/components/report/report-card";
+import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
 import { Button } from "@/components/ui/button";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { listReports } from "@/lib/reports";
@@ -65,9 +66,15 @@ export default async function ReportsPage() {
             body="Be the first to report a civic issue in your community."
           />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {reports.map((report) => (
-              <ReportCard key={report.id} report={report} />
+              <div key={report.id} className="space-y-2">
+                <ReportCard report={report} />
+                <AIReasoningPanel
+                  analysis={report.aiAnalysis}
+                  userCategory={report.category}
+                />
+              </div>
             ))}
           </div>
         )}
