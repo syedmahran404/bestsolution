@@ -68,6 +68,18 @@ export const CATEGORY_META: Record<
 export const GEMINI_MODEL = "gemini-2.5-flash";
 
 /* -------------------------------------------------------------------------- */
+/*                            Aggregation engine                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Radius (meters) within which a new report of the SAME category is treated as
+ * part of an existing civic case. Deterministic clustering threshold (Phase 3).
+ * ~150m balances "same street/junction" grouping without merging unrelated
+ * issues in a neighbourhood.
+ */
+export const AGGREGATION_RADIUS_M = 150;
+
+/* -------------------------------------------------------------------------- */
 /*                              Firestore paths                               */
 /* -------------------------------------------------------------------------- */
 
@@ -76,4 +88,5 @@ export const COLLECTIONS = {
   clusters: "clusters",
   departments: "departments",
   reports: "reports",
+  civicCases: "civicCases",
 } as const;

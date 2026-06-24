@@ -11,7 +11,7 @@
 import { NextResponse } from "next/server";
 
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
-import { createReport, listReports } from "@/lib/reports";
+import { listReports, submitReport } from "@/lib/reports";
 import { createReportSchema } from "@/lib/validation/report";
 
 // Reports are user data that must never be statically cached.
@@ -45,8 +45,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const report = await createReport(parsed.data);
-    return NextResponse.json({ report }, { status: 201 });
+    const { report, aggregation } = await submitReport(parsed.data);
+    return NextResponse.json({ report, aggregation }, { status: 201 });
   } catch (err) {
     console.error("[api/reports] create failed:", err);
     return NextResponse.json(
