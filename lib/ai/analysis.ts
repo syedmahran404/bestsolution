@@ -17,9 +17,8 @@ import "server-only";
 
 import { z } from "zod";
 
-import { GEMINI_MODEL } from "@/lib/constants";
+import { COLLECTIONS, GEMINI_MODEL } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
-import { COLLECTIONS } from "@/lib/constants";
 import { getGeminiModel, isGeminiConfigured } from "@/lib/gemini/config";
 import { REPORT_CATEGORIES } from "@/lib/validation/report";
 import type { AIAnalysis, CivicReport, IssueCategory } from "@/types";
@@ -109,56 +108,80 @@ function clampConfidence(value: number | undefined): number {
  * Analyze a report with Gemini and persist the result on the report document.
  * Returns the analysis, or null when Gemini is unconfigured or the call fails.
  */
+/** Run one Gemini analysis pass (optionally with audio). Persists + returns. */
+async function runAnalysis(
+  report: CivicReport,
+  audio: { mimeType: string; data: string } | null,
+): Promise<AIAnalysis> {
+  const model = getGeminiModel();
+  const parts: Array<
+    { text: string } | { inlineData: { mimeType: string; data: string } }
+  > = [{ text: buildPrompt(report, Boolean(audio)) }];
+  if (audio) {
+    parts.push({
+      inlineData: { mimeType: audio.mimeType, data: audio.data },
+    });
+  }
+
+  const result = await model.generateContent({
+    contents: [{ role: "user", parts }],
+    generationConfig: {
+      temperature: 0,
+      responseMimeType: "application/json",
+      maxOutputTokens: 800,
+    },
+  });
+
+  const parsed = aiOutputSchema.parse(parseJson(result.response.text()));
+
+  const analysis: AIAnalysis = {
+    category: coerceCategory(parsed.category),
+    confidence: clampConfidence(parsed.confidence),
+    reasoning: parsed.reasoning?.trim() || "No reasoning provided.",
+    keywords: (parsed.keywords ?? []).slice(0, 5),
+    summary: parsed.summary?.trim() || report.title,
+    transcript: parsed.transcript?.trim() ? parsed.transcript.trim() : null,
+    model: GEMINI_MODEL,
+    generatedAt: new Date().toISOString(),
+  };
+
+  await getAdminDb()
+    .collection(COLLECTIONS.reports)
+    .doc(report.id)
+    .update({ aiAnalysis: analysis });
+
+  return analysis;
+}
+
+/**
+ * Analyze a report with Gemini and persist the result on the report document.
+ * Returns the analysis, or null when Gemini is unconfigured or the call fails.
+ *
+ * Robustness: if a call WITH audio fails (e.g. an unsupported recording format
+ * such as WebM), we retry text-only so classification + reasoning still
+ * succeed — only the transcript is lost. Voice reports are never left without
+ * any analysis.
+ */
 export async function analyzeReport(
   report: CivicReport,
 ): Promise<AIAnalysis | null> {
   if (!isGeminiConfigured) return null;
 
+  const audio = report.audioUrl
+    ? await fetchAudioInline(report.audioUrl)
+    : null;
+
   try {
-    const audio = report.audioUrl
-      ? await fetchAudioInline(report.audioUrl)
-      : null;
-
-    const model = getGeminiModel();
-    const parts: Array<
-      { text: string } | { inlineData: { mimeType: string; data: string } }
-    > = [{ text: buildPrompt(report, Boolean(audio)) }];
-    if (audio) {
-      parts.push({
-        inlineData: { mimeType: audio.mimeType, data: audio.data },
-      });
-    }
-
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts }],
-      generationConfig: {
-        temperature: 0,
-        responseMimeType: "application/json",
-        maxOutputTokens: 800,
-      },
-    });
-
-    const parsed = aiOutputSchema.parse(parseJson(result.response.text()));
-
-    const analysis: AIAnalysis = {
-      category: coerceCategory(parsed.category),
-      confidence: clampConfidence(parsed.confidence),
-      reasoning: parsed.reasoning?.trim() || "No reasoning provided.",
-      keywords: (parsed.keywords ?? []).slice(0, 5),
-      summary: parsed.summary?.trim() || report.title,
-      transcript: parsed.transcript?.trim() ? parsed.transcript.trim() : null,
-      model: GEMINI_MODEL,
-      generatedAt: new Date().toISOString(),
-    };
-
-    await getAdminDb()
-      .collection(COLLECTIONS.reports)
-      .doc(report.id)
-      .update({ aiAnalysis: analysis });
-
-    return analysis;
+    return await runAnalysis(report, audio);
   } catch (err) {
     console.error("[ai/analysis] analysis failed:", err);
+    if (audio) {
+      try {
+        return await runAnalysis(report, null);
+      } catch (err2) {
+        console.error("[ai/analysis] text-only retry failed:", err2);
+      }
+    }
     return null;
   }
 }

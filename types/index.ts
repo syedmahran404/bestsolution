@@ -43,6 +43,15 @@ export type SeverityLabel = "low" | "medium" | "high" | "critical";
 /** How a report entered the system. */
 export type ReportInputType = "photo" | "voice";
 
+/** A single status-change record in a civic case's operational timeline. */
+export interface StatusHistoryEntry {
+  status: IssueStatus;
+  /** ISO timestamp of the change. */
+  at: string;
+  /** Optional operator note. */
+  note?: string;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                               AI Analysis                                  */
 /* -------------------------------------------------------------------------- */
@@ -174,6 +183,9 @@ export interface CivicCase {
 
   /** Ids of the member reports. */
   reportIds: string[];
+
+  /** Status change history (Phase 5 — operations timeline). */
+  statusHistory?: StatusHistoryEntry[];
 
   /**
    * AI-generated case summary (Phase 4). Cached on the document and keyed by
