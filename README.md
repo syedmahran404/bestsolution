@@ -8,6 +8,42 @@ Velora is not a complaint form. It is an AI-powered civic intelligence platform 
 
 ---
 
+## Status: Phase 4 — Civic Intelligence Layer ✅
+
+Adds **visible** AI understanding on top of the deterministic engine. The AI
+explains itself — no black-box decisions.
+
+- **Gemini classification + voice understanding** (one call per report): at
+  submit time a single multimodal Gemini call returns the AI category +
+  confidence, a human-readable reasoning, detected keywords, a concise summary,
+  and (if a voice note is attached) a verbatim transcript.
+- **Agent Reasoning Panel**: every report shows _why_ it was classified —
+  category, confidence %, reasoning, detected keywords, summary, and transcript
+  (on My Reports and the case detail page).
+- **Civic case intelligence**: each case gets an AI summary + community-impact
+  line (e.g. "12 reports indicate recurring road damage near Mysuru Ring Road").
+- **Linkage explanation**: a deterministic, human-readable reason for why
+  reports were aggregated (same category + within the 150m radius).
+- **AI Insights cards** (deterministic): most common issue, largest civic case,
+  recently growing cases.
+- **`AIAnalysis`** stored on each report: `category, confidence, reasoning,
+keywords, summary, transcript, model, generatedAt`.
+
+### Token optimization
+
+- Exactly **one** Gemini call per report; result stored immutably (never
+  re-called).
+- Case summaries are **lazy + cached** on the case document, keyed by
+  `reportCount` — regenerated only when the case grows, and only when viewed.
+  Single-report cases and insights use deterministic logic (zero Gemini calls).
+- Gemini is **never** used for distance, clustering, or aggregation.
+- Graceful: if Gemini is unconfigured, reports still submit/aggregate with
+  `aiAnalysis = null` and deterministic case summaries.
+
+> No severity scoring, department routing, resolution, or admin yet (Phases 5–6).
+
+---
+
 ## Status: Phase 3 — Aggregation Engine ✅
 
 The core differentiator: many individual reports are automatically collapsed

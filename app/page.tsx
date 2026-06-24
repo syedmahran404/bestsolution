@@ -1,9 +1,11 @@
 import { SiteHeader } from "@/components/site-header";
 import { CivicMap } from "@/components/map/civic-map";
 import { AggregationMetrics } from "@/components/aggregation-metrics";
+import { AIInsights } from "@/components/ai/ai-insights";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { CATEGORY_META } from "@/lib/constants";
 import { computeAggregationMetrics } from "@/lib/aggregation";
+import { computeCivicInsights } from "@/lib/insights";
 import { listCivicCases } from "@/lib/civic-cases";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { SEED_ISSUES } from "@/lib/seed-data";
@@ -78,6 +80,15 @@ export default async function HomePage() {
 
         <AggregationMetrics {...metrics} />
 
+        {usingLiveData && (
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold tracking-tight">
+              AI insights
+            </h2>
+            <AIInsights insights={computeCivicInsights(cases)} />
+          </section>
+        )}
+
         <section className="min-h-[480px]">
           <div className="h-[58vh] min-h-[440px] w-full">
             <CivicMap markers={markers} />
@@ -100,8 +111,8 @@ export default async function HomePage() {
 
       <footer className="border-t py-4">
         <div className="container text-center text-xs text-muted-foreground">
-          Velora Civic AI · Built for the Vibe2Ship Hackathon · Phase 3
-          Aggregation Engine
+          Velora Civic AI · Built for the Vibe2Ship Hackathon · Phase 4 Civic
+          Intelligence
         </div>
       </footer>
     </div>

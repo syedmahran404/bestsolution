@@ -11,8 +11,9 @@ import "server-only";
 import { COLLECTIONS } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { aggregateReport, type AggregationResult } from "@/lib/aggregation";
+import { analyzeReport } from "@/lib/ai/analysis";
 import type { CreateReportInput } from "@/lib/validation/report";
-import type { CivicReport } from "@/types";
+import type { AIAnalysis, CivicReport } from "@/types";
 
 /** Persist a new report and return the created document. */
 export async function createReport(
@@ -40,19 +41,32 @@ export async function createReport(
 }
 
 /**
- * Create a report AND run the aggregation engine (Phase 3): the report is
- * linked to a new or existing civic case. Returns the linked report plus the
- * aggregation outcome.
+ * Create a report, run the aggregation engine (Phase 3), and run the Civic
+ * Intelligence analysis (Phase 4). The report is linked to a civic case and
+ * analyzed by Gemini in a single submit flow.
+ *
+ * AI analysis is best-effort: if Gemini is unconfigured or fails, the report
+ * is still created and aggregated (analysis = null).
  */
 export async function submitReport(input: CreateReportInput): Promise<{
   report: CivicReport;
   aggregation: AggregationResult;
+  analysis: AIAnalysis | null;
 }> {
   const report = await createReport(input);
   const aggregation = await aggregateReport(report);
+  const linkedReport: CivicReport = {
+    ...report,
+    civicCaseId: aggregation.civicCaseId,
+  };
+
+  // Phase 4: one Gemini call; persisted on the report doc inside analyzeReport.
+  const analysis = await analyzeReport(linkedReport);
+
   return {
-    report: { ...report, civicCaseId: aggregation.civicCaseId },
+    report: { ...linkedReport, aiAnalysis: analysis },
     aggregation,
+    analysis,
   };
 }
 

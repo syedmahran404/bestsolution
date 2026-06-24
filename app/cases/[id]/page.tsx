@@ -5,10 +5,14 @@ import { ArrowLeft, Layers, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { CivicMap } from "@/components/map/civic-map";
 import { ReportCard } from "@/components/report/report-card";
+import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
+import { CaseSummaryCard } from "@/components/ai/case-summary-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_META, STATUS_META } from "@/lib/constants";
 import { getCivicCase, getReportsForCase } from "@/lib/civic-cases";
+import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
+import { explainLinkage } from "@/lib/insights";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicMapMarker } from "@/types";
 
@@ -35,11 +39,13 @@ export default async function CaseDetailPage({
   }
 
   const civicCase = await getCivicCase(params.id);
-  if (!civicCase) notFound();
+  if (!civicCase) return notFound();
 
   const reports = await getReportsForCase(params.id);
   const category = CATEGORY_META[civicCase.category];
   const status = STATUS_META[civicCase.status];
+  const intelligence = await getOrGenerateCaseIntelligence(civicCase, reports);
+  const linkage = explainLinkage(civicCase);
 
   const markers: CivicMapMarker[] = reports.map((r) => ({
     id: r.id,
@@ -114,6 +120,12 @@ export default async function CaseDetailPage({
           </CardContent>
         </Card>
 
+        {/* AI case intelligence */}
+        <CaseSummaryCard
+          summary={intelligence.summary}
+          impact={intelligence.impact}
+        />
+
         {/* Member report locations */}
         <section className="space-y-2">
           <h2 className="flex items-center gap-1.5 text-lg font-semibold">
@@ -130,14 +142,27 @@ export default async function CaseDetailPage({
           <h2 className="text-lg font-semibold">
             Linked reports ({reports.length})
           </h2>
+
+          {/* Why these reports are linked (deterministic explanation) */}
+          <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
+            <Layers className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{linkage}</span>
+          </div>
+
           {reports.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No linked reports found.
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {reports.map((r) => (
-                <ReportCard key={r.id} report={r} />
+                <div key={r.id} className="space-y-2">
+                  <ReportCard report={r} />
+                  <AIReasoningPanel
+                    analysis={r.aiAnalysis}
+                    userCategory={r.category}
+                  />
+                </div>
               ))}
             </div>
           )}
