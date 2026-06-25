@@ -111,8 +111,8 @@ export default async function HomePage() {
 
       <footer className="border-t py-4">
         <div className="container text-center text-xs text-muted-foreground">
-          Velora Civic AI · Built for the Vibe2Ship Hackathon · Phase 4 Civic
-          Intelligence
+          Velora Civic AI · AI Civic Operations Center · Built for the Vibe2Ship
+          Hackathon
         </div>
       </footer>
     </div>

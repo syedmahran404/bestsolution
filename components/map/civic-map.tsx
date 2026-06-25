@@ -67,7 +67,11 @@ export function CivicMap({ markers }: CivicMapProps) {
 
   return (
     <APIProvider apiKey={apiKey}>
-      <div className="relative h-full w-full overflow-hidden rounded-xl border">
+      <div
+        className="relative h-full w-full overflow-hidden rounded-xl border"
+        role="region"
+        aria-label="Interactive civic issues map of India"
+      >
         <Map
           defaultCenter={INDIA_MAP_CONFIG.center}
           defaultZoom={INDIA_MAP_CONFIG.zoom}

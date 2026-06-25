@@ -82,7 +82,7 @@ export function ReportForm() {
         throw new Error(data.error ?? "Failed to submit report.");
       }
 
-      router.push("/reports");
+      router.push("/reports?submitted=1");
       router.refresh();
     } catch (err) {
       setSubmitError(

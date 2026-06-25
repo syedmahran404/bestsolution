@@ -38,8 +38,14 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Category</Label>
+          <Label
+            htmlFor="filter-category"
+            className="text-xs text-muted-foreground"
+          >
+            Category
+          </Label>
           <select
+            id="filter-category"
             className={selectCls}
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -54,8 +60,14 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Status</Label>
+          <Label
+            htmlFor="filter-status"
+            className="text-xs text-muted-foreground"
+          >
+            Status
+          </Label>
           <select
+            id="filter-status"
             className={selectCls}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
@@ -70,8 +82,11 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Min reports</Label>
+          <Label htmlFor="filter-min" className="text-xs text-muted-foreground">
+            Min reports
+          </Label>
           <Input
+            id="filter-min"
             type="number"
             min={0}
             placeholder="0"
@@ -81,8 +96,14 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">From date</Label>
+          <Label
+            htmlFor="filter-from"
+            className="text-xs text-muted-foreground"
+          >
+            From date
+          </Label>
           <Input
+            id="filter-from"
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
