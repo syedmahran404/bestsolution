@@ -25,7 +25,7 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1" aria-label="Primary">
           <Button asChild variant="ghost" size="sm">
             <Link href="/">Map</Link>
           </Button>

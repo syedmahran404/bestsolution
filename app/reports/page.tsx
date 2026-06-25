@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FilePlus2, Inbox } from "lucide-react";
+import { CheckCircle2, FilePlus2, Inbox } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { ReportCard } from "@/components/report/report-card";
@@ -17,7 +17,11 @@ export const metadata = {
 };
 
 /** Phase 2 — submitted reports listing. */
-export default async function ReportsPage() {
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams?: { submitted?: string };
+}) {
   let reports: CivicReport[] = [];
   let loadError = false;
 
@@ -30,11 +34,22 @@ export default async function ReportsPage() {
     }
   }
 
+  const justSubmitted = searchParams?.submitted === "1";
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
 
       <main className="container max-w-3xl flex-1 py-8">
+        {justSubmitted && (
+          <div className="mb-4 flex items-center gap-2 rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            <p>
+              Report submitted and analyzed. It has been added to a civic case.
+            </p>
+          </div>
+        )}
+
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold tracking-tight">My Reports</h1>

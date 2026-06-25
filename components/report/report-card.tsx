@@ -28,6 +28,8 @@ export function ReportCard({ report }: { report: CivicReport }) {
         <img
           src={report.imageUrl}
           alt={report.title}
+          loading="lazy"
+          decoding="async"
           className="h-20 w-20 shrink-0 rounded-md border object-cover"
         />
       ) : (
