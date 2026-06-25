@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "check:gemini": "node scripts/check-gemini.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

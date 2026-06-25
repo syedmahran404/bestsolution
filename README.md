@@ -8,6 +8,36 @@ Velora is not a complaint form. It is an AI-powered civic intelligence platform 
 
 ---
 
+## Status: Phase 5 — Operations Center ✅
+
+The judge-facing operational workflow on top of all prior phases.
+
+- **Admin Operations Center** (`/admin`): KPI cards (total reports, civic cases,
+  open, resolved, active clusters) + deterministic analytics — largest civic
+  cases, most reported categories, active clusters, recent activity. **No Gemini.**
+- **Civic Case Management** (`/admin/cases`): searchable, filterable case list
+  (category, status, min report count, start date).
+- **Status workflow**: Reported → Verified → In Progress → Resolved. Changing a
+  case status appends a status-history entry and **cascades to all member
+  reports**, so the map, My Reports, and dashboards stay consistent.
+  `PATCH /api/cases/[id]/status`.
+- **Operational case view** (`/cases/[id]`): status manager controls + **status
+  timeline** + aggregation information + AI summary + linked reports with AI
+  reasoning — a single operational view.
+- `CivicCase` gains a `statusHistory` timeline.
+
+> Out of scope (by design): department recommendation, resolution suggestions,
+> autonomous actions, cost/SLA analytics, embeddings, self-learning.
+
+### Runtime validation note
+
+The build sandbox has **no external network**, so live Gemini/Firebase/Maps
+calls cannot be executed there. Use `npm run check:gemini` (with
+`GEMINI_API_KEY` set) on a networked machine to validate the live Gemini
+classification path, and deploy to Vercel for full end-to-end testing.
+
+---
+
 ## Status: Phase 4 — Civic Intelligence Layer ✅
 
 Adds **visible** AI understanding on top of the deterministic engine. The AI

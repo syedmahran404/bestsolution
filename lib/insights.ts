@@ -65,3 +65,64 @@ export function explainLinkage(civicCase: CivicCase): string {
   }
   return `Linked because it shares the category “${label}” and falls within the ${AGGREGATION_RADIUS_M}m aggregation radius of the other reports in this case.`;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                      Operations analytics (Phase 5)                        */
+/* -------------------------------------------------------------------------- */
+
+export interface OperationsMetrics {
+  totalReports: number;
+  totalCases: number;
+  openCases: number;
+  closedCases: number;
+  recentlyActive: CivicCase[];
+  topCategories: { category: IssueCategory; reportCount: number }[];
+  activeClusters: CivicCase[];
+  largestCases: CivicCase[];
+}
+
+/**
+ * Deterministic operations dashboard metrics (Phase 5). NO Gemini.
+ * "Open" = any non-resolved case; "Closed" = resolved.
+ */
+export function computeOperationsMetrics(
+  cases: CivicCase[],
+  listLimit = 5,
+): OperationsMetrics {
+  const totalCases = cases.length;
+  const totalReports = cases.reduce((s, c) => s + (c.reportCount || 0), 0);
+  const closedCases = cases.filter((c) => c.status === "resolved").length;
+  const openCases = totalCases - closedCases;
+
+  const byUpdated = [...cases].sort((a, b) =>
+    a.updatedAt < b.updatedAt ? 1 : -1,
+  );
+  const recentlyActive = byUpdated.slice(0, listLimit);
+
+  // Reports per category.
+  const catCounts = new Map<IssueCategory, number>();
+  for (const c of cases) {
+    catCounts.set(c.category, (catCounts.get(c.category) ?? 0) + c.reportCount);
+  }
+  const topCategories = [...catCounts.entries()]
+    .map(([category, reportCount]) => ({ category, reportCount }))
+    .sort((a, b) => b.reportCount - a.reportCount)
+    .slice(0, listLimit);
+
+  const byCount = [...cases].sort((a, b) => b.reportCount - a.reportCount);
+  const largestCases = byCount.slice(0, listLimit);
+  const activeClusters = byCount
+    .filter((c) => c.reportCount > 1 && c.status !== "resolved")
+    .slice(0, listLimit);
+
+  return {
+    totalReports,
+    totalCases,
+    openCases,
+    closedCases,
+    recentlyActive,
+    topCategories,
+    activeClusters,
+    largestCases,
+  };
+}

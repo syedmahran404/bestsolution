@@ -7,9 +7,16 @@
  */
 import "server-only";
 
+import { FieldValue } from "firebase-admin/firestore";
+
 import { COLLECTIONS } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
-import type { CivicCase, CivicReport } from "@/types";
+import type {
+  CivicCase,
+  CivicReport,
+  IssueStatus,
+  StatusHistoryEntry,
+} from "@/types";
 
 /** List civic cases, most-aggregated first (then most recently updated). */
 export async function listCivicCases(max = 200): Promise<CivicCase[]> {
@@ -49,4 +56,47 @@ export async function getReportsForCase(
   return snap.docs
     .map((d) => d.data() as CivicReport)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+}
+
+/**
+ * Update a civic case's status (Phase 5 operations workflow).
+ *
+ * - Appends a status-history entry (operational timeline).
+ * - Cascades the status to all member reports so every related view
+ *   (map color, My Reports, case detail) stays consistent.
+ * Returns the updated case.
+ */
+export async function updateCaseStatus(
+  id: string,
+  status: IssueStatus,
+  note?: string,
+): Promise<CivicCase | null> {
+  const db = getAdminDb();
+  const now = new Date().toISOString();
+  const caseRef = db.collection(COLLECTIONS.civicCases).doc(id);
+
+  const snap = await caseRef.get();
+  if (!snap.exists) return null;
+
+  const entry: StatusHistoryEntry = { status, at: now };
+  if (note) entry.note = note;
+
+  const batch = db.batch();
+  batch.update(caseRef, {
+    status,
+    updatedAt: now,
+    statusHistory: FieldValue.arrayUnion(entry),
+  });
+
+  // Cascade to member reports.
+  const reportsSnap = await db
+    .collection(COLLECTIONS.reports)
+    .where("civicCaseId", "==", id)
+    .get();
+  reportsSnap.docs.forEach((d) => batch.update(d.ref, { status }));
+
+  await batch.commit();
+
+  const updated = await caseRef.get();
+  return updated.data() as CivicCase;
 }

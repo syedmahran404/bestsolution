@@ -30,6 +30,9 @@ export function SiteHeader() {
             <Link href="/">Map</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
+            <Link href="/admin">Operations</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
             <Link href="/reports">My Reports</Link>
           </Button>
           <Button asChild size="sm">

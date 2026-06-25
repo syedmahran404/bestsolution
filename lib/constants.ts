@@ -80,6 +80,21 @@ export const GEMINI_MODEL = "gemini-2.5-flash";
 export const AGGREGATION_RADIUS_M = 150;
 
 /* -------------------------------------------------------------------------- */
+/*                          Status workflow (Phase 5)                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Ordered operational workflow for a civic case. "reported" is the entry
+ * ("Open") state; "resolved" closes the case.
+ */
+export const WORKFLOW_STATUSES = [
+  "reported",
+  "verified",
+  "in_progress",
+  "resolved",
+] as const;
+
+/* -------------------------------------------------------------------------- */
 /*                              Firestore paths                               */
 /* -------------------------------------------------------------------------- */
 

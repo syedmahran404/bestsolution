@@ -7,9 +7,15 @@ import { CivicMap } from "@/components/map/civic-map";
 import { ReportCard } from "@/components/report/report-card";
 import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
 import { CaseSummaryCard } from "@/components/ai/case-summary-card";
+import { StatusManager } from "@/components/cases/status-manager";
+import { StatusTimeline } from "@/components/cases/status-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CATEGORY_META, STATUS_META } from "@/lib/constants";
+import {
+  AGGREGATION_RADIUS_M,
+  CATEGORY_META,
+  STATUS_META,
+} from "@/lib/constants";
 import { getCivicCase, getReportsForCase } from "@/lib/civic-cases";
 import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
 import { explainLinkage } from "@/lib/insights";
@@ -18,7 +24,7 @@ import type { CivicMapMarker } from "@/types";
 
 export const dynamic = "force-dynamic";
 
-/** Phase 3 — read-only civic case detail screen. */
+/** Phase 5 — operational civic case view (read + status workflow). */
 export default async function CaseDetailPage({
   params,
 }: {
@@ -126,6 +132,58 @@ export default async function CaseDetailPage({
           impact={intelligence.impact}
         />
 
+        {/* Operations: status workflow + timeline + aggregation info */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Operations</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <StatusManager
+                caseId={civicCase.id}
+                currentStatus={civicCase.status}
+              />
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Status timeline
+                </p>
+                <StatusTimeline
+                  history={civicCase.statusHistory}
+                  fallbackStatus={civicCase.status}
+                  createdAt={civicCase.createdAt}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">
+                Aggregation information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4 text-sm">
+              <Metric
+                label="Reports aggregated"
+                value={String(civicCase.reportCount)}
+              />
+              <Metric
+                label="Clustering radius"
+                value={`${AGGREGATION_RADIUS_M} m`}
+              />
+              <Metric
+                label="Centroid"
+                value={`${civicCase.centerLocation.lat.toFixed(4)}, ${civicCase.centerLocation.lng.toFixed(4)}`}
+              />
+              <Metric label="Category" value={category.label} />
+              <div className="col-span-2 flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
+                <Layers className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>{linkage}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Member report locations */}
         <section className="space-y-2">
           <h2 className="flex items-center gap-1.5 text-lg font-semibold">
@@ -142,12 +200,6 @@ export default async function CaseDetailPage({
           <h2 className="text-lg font-semibold">
             Linked reports ({reports.length})
           </h2>
-
-          {/* Why these reports are linked (deterministic explanation) */}
-          <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
-            <Layers className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{linkage}</span>
-          </div>
 
           {reports.length === 0 ? (
             <p className="text-sm text-muted-foreground">
