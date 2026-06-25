@@ -6,10 +6,23 @@
  * end to end, mirroring lib/ai/analysis.ts.
  *
  * Usage:
+ *   npm run check:gemini            (loads .env.local automatically)
  *   GEMINI_API_KEY=your_key node scripts/check-gemini.mjs
  *
  * The key is read from the environment only — never hardcode it.
  */
+import { existsSync } from "node:fs";
+import dotenv from "dotenv";
+
+// Load local env files (gitignored) when the key isn't already in the
+// environment, so `npm run check:gemini` works without extra flags. Existing
+// environment variables are never overridden.
+if (!process.env.GEMINI_API_KEY) {
+  for (const file of [".env.local", ".env"]) {
+    if (existsSync(file)) dotenv.config({ path: file });
+  }
+}
+
 const key = process.env.GEMINI_API_KEY;
 if (!key) {
   console.error("✗ GEMINI_API_KEY is not set in the environment.");
