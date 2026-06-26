@@ -8,8 +8,10 @@ import { ReportCard } from "@/components/report/report-card";
 import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
 import { CaseSummaryCard } from "@/components/ai/case-summary-card";
 import { ContextCard } from "@/components/context/context-card";
+import { OperationsBriefPanel } from "@/components/operations/operations-brief-panel";
+import { PriorityPanel } from "@/components/operations/priority-panel";
+import { OperationsTimeline } from "@/components/operations/operations-timeline";
 import { StatusManager } from "@/components/cases/status-manager";
-import { StatusTimeline } from "@/components/cases/status-timeline";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,6 +21,12 @@ import {
 } from "@/lib/constants";
 import { getCivicCase, getReportsForCase } from "@/lib/civic-cases";
 import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
+import { getOrGenerateOperationsBrief } from "@/lib/ai/operations-brief";
+import {
+  buildOperationsTimeline,
+  computePriority,
+  recommendAction,
+} from "@/lib/operations";
 import { explainLinkage } from "@/lib/insights";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicMapMarker, ContextFactor } from "@/types";
@@ -53,6 +61,18 @@ export default async function CaseDetailPage({
   const status = STATUS_META[civicCase.status];
   const intelligence = await getOrGenerateCaseIntelligence(civicCase, reports);
   const linkage = explainLinkage(civicCase);
+
+  // U3 — agentic operations layer (priority + recommendation are deterministic;
+  // the brief is a cached AI synthesis with a deterministic fallback).
+  const priority = computePriority(civicCase, reports);
+  const recommendation = recommendAction(civicCase, priority);
+  const opsBrief = await getOrGenerateOperationsBrief(
+    civicCase,
+    reports,
+    priority,
+    recommendation,
+  );
+  const timeline = buildOperationsTimeline(civicCase, reports);
 
   const markers: CivicMapMarker[] = reports.map((r) => ({
     id: r.id,
@@ -169,6 +189,12 @@ export default async function CaseDetailPage({
           source={repBySeverity?.contextSource}
         />
 
+        {/* U3: agentic operations brief (explainable) */}
+        <OperationsBriefPanel brief={opsBrief} />
+
+        {/* U3: explainable prioritization + recommendation */}
+        <PriorityPanel priority={priority} recommendation={recommendation} />
+
         {/* Operations: status workflow + timeline + aggregation info */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
@@ -182,13 +208,9 @@ export default async function CaseDetailPage({
               />
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Status timeline
+                  Operations timeline
                 </p>
-                <StatusTimeline
-                  history={civicCase.statusHistory}
-                  fallbackStatus={civicCase.status}
-                  createdAt={civicCase.createdAt}
-                />
+                <OperationsTimeline events={timeline} />
               </div>
             </CardContent>
           </Card>

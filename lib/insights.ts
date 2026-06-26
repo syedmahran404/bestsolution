@@ -79,10 +79,18 @@ export interface OperationsMetrics {
   topCategories: { category: IssueCategory; reportCount: number }[];
   activeClusters: CivicCase[];
   largestCases: CivicCase[];
+  /* ---- U3 operational analytics (additive) ---- */
+  localities: { name: string; reportCount: number }[];
+  districts: { name: string; reportCount: number }[];
+  recentlyEscalated: CivicCase[];
+  fastestGrowing: CivicCase | null;
+  dailyActiveCount: number;
+  weeklyActiveCount: number;
+  avgClusterSize: number;
 }
 
 /**
- * Deterministic operations dashboard metrics (Phase 5). NO Gemini.
+ * Deterministic operations dashboard metrics (Phase 5 + U3). NO Gemini.
  * "Open" = any non-resolved case; "Closed" = resolved.
  */
 export function computeOperationsMetrics(
@@ -115,6 +123,30 @@ export function computeOperationsMetrics(
     .filter((c) => c.reportCount > 1 && c.status !== "resolved")
     .slice(0, listLimit);
 
+  // U3: reports grouped by locality / district.
+  const groupCounts = (key: "locality" | "district") => {
+    const m = new Map<string, number>();
+    for (const c of cases) {
+      const name = (c[key] ?? "").trim();
+      if (!name) continue;
+      m.set(name, (m.get(name) ?? 0) + c.reportCount);
+    }
+    return [...m.entries()]
+      .map(([name, reportCount]) => ({ name, reportCount }))
+      .sort((a, b) => b.reportCount - a.reportCount)
+      .slice(0, listLimit);
+  };
+
+  const now = Date.now();
+  const within = (iso: string, hours: number) =>
+    (now - new Date(iso).getTime()) / 36e5 <= hours;
+
+  const recentlyEscalated = byUpdated
+    .filter((c) => c.status === "verified" || c.status === "in_progress")
+    .slice(0, listLimit);
+
+  const fastestGrowing = byCount.filter((c) => c.reportCount > 1)[0] ?? null;
+
   return {
     totalReports,
     totalCases,
@@ -124,5 +156,13 @@ export function computeOperationsMetrics(
     topCategories,
     activeClusters,
     largestCases,
+    localities: groupCounts("locality"),
+    districts: groupCounts("district"),
+    recentlyEscalated,
+    fastestGrowing,
+    dailyActiveCount: cases.filter((c) => within(c.updatedAt, 24)).length,
+    weeklyActiveCount: cases.filter((c) => within(c.updatedAt, 24 * 7)).length,
+    avgClusterSize:
+      totalCases === 0 ? 0 : Number((totalReports / totalCases).toFixed(1)),
   };
 }
