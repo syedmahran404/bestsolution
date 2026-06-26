@@ -7,6 +7,7 @@ import { CivicMap } from "@/components/map/civic-map";
 import { ReportCard } from "@/components/report/report-card";
 import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
 import { CaseSummaryCard } from "@/components/ai/case-summary-card";
+import { ContextCard } from "@/components/context/context-card";
 import { StatusManager } from "@/components/cases/status-manager";
 import { StatusTimeline } from "@/components/cases/status-timeline";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,7 @@ import { getCivicCase, getReportsForCase } from "@/lib/civic-cases";
 import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
 import { explainLinkage } from "@/lib/insights";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
-import type { CivicMapMarker } from "@/types";
+import type { CivicMapMarker, ContextFactor } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,26 @@ export default async function CaseDetailPage({
     lat: r.latitude,
     lng: r.longitude,
     reportCount: 1,
+    severityLabel: r.severityLabel,
+    locality: r.locality ?? null,
   }));
+
+  // U2: aggregate member context for the case-level context card.
+  const repBySeverity = [...reports].sort(
+    (a, b) => (b.severityScore ?? 0) - (a.severityScore ?? 0),
+  )[0];
+  const aggFactors: ContextFactor[] = (() => {
+    const byType = new Map<string, ContextFactor>();
+    for (const r of reports) {
+      for (const f of r.contextFactors ?? []) {
+        const ex = byType.get(f.type);
+        if (!ex || f.distanceM < ex.distanceM) byType.set(f.type, f);
+      }
+    }
+    return Array.from(byType.values()).sort(
+      (a, b) => a.distanceM - b.distanceM,
+    );
+  })();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -130,6 +150,23 @@ export default async function CaseDetailPage({
         <CaseSummaryCard
           summary={intelligence.summary}
           impact={intelligence.impact}
+        />
+
+        {/* Civic context (U2) */}
+        <ContextCard
+          locality={civicCase.locality ?? repBySeverity?.locality}
+          district={civicCase.district ?? repBySeverity?.district}
+          state={repBySeverity?.state}
+          formattedAddress={repBySeverity?.formattedAddress}
+          factors={aggFactors}
+          severityScore={
+            civicCase.severityScore ?? repBySeverity?.severityScore
+          }
+          severityLabel={
+            civicCase.severityLabel ?? repBySeverity?.severityLabel
+          }
+          severityReasons={repBySeverity?.severityReasons}
+          source={repBySeverity?.contextSource}
         />
 
         {/* Operations: status workflow + timeline + aggregation info */}

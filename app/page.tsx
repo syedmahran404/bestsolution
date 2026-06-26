@@ -43,6 +43,8 @@ export default async function HomePage() {
         lng: c.centerLocation.lng,
         reportCount: c.reportCount,
         href: `/cases/${c.id}`,
+        severityLabel: c.severityLabel,
+        locality: c.locality ?? null,
       }))
     : SEED_ISSUES.map((i) => ({
         id: i.id,

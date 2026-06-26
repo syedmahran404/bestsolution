@@ -136,6 +136,20 @@ export function CivicMap({ markers }: CivicMapProps) {
                   <p className="text-xs text-slate-500">Single report</p>
                 )}
 
+                {selected.severityLabel && (
+                  <p className="text-xs text-slate-600">
+                    Severity:{" "}
+                    <span className="font-medium capitalize">
+                      {selected.severityLabel}
+                    </span>
+                  </p>
+                )}
+                {selected.locality && (
+                  <p className="text-xs text-slate-500">
+                    📍 {selected.locality}
+                  </p>
+                )}
+
                 {selected.href && (
                   <a
                     href={selected.href}

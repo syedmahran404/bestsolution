@@ -56,18 +56,38 @@ function buildPrompt(civicCase: CivicCase, reports: CivicReport[]): string {
     .slice(0, 8)
     .map((r, i) => `${i + 1}. ${r.title}`)
     .join("\n");
+
+  // U2: provide locality + nearby landmarks so the summary is context-aware.
+  const locality =
+    civicCase.locality ?? reports.find((r) => r.locality)?.locality ?? null;
+  const landmarks = Array.from(
+    new Set(
+      reports.flatMap((r) =>
+        (r.contextFactors ?? []).map((f) => `${f.type} (${f.name})`),
+      ),
+    ),
+  ).slice(0, 6);
+  const severity = civicCase.severityLabel ?? null;
+
   return [
     "You summarize aggregated civic cases for a city operations center. Return STRICT JSON.",
     `Category: ${label}`,
     `Number of reports in this case: ${civicCase.reportCount}`,
+    locality ? `Locality: ${locality}` : "Locality: unknown",
+    severity ? `Context-aware severity: ${severity}` : "",
+    landmarks.length
+      ? `Nearby impactful places: ${landmarks.join(", ")}`
+      : "Nearby impactful places: none detected",
     "Report titles:",
     titles,
     "",
     "Return JSON with keys:",
     '- "summary": ONE concise sentence like "12 reports indicate recurring road damage near Mysuru Ring Road."',
-    '- "impact": ONE concise sentence on community impact.',
-    "Be specific and reference location names from the titles when possible. JSON only.",
-  ].join("\n");
+    '- "impact": ONE concise sentence on community impact, referencing nearby places (e.g. a school/hospital) when relevant.',
+    "Be specific and reference the locality and landmarks when possible. JSON only.",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function parseJson(text: string): unknown {

@@ -43,6 +43,25 @@ export type SeverityLabel = "low" | "medium" | "high" | "critical";
 /** How a report entered the system. */
 export type ReportInputType = "photo" | "voice";
 
+/* -------------------------------------------------------------------------- */
+/*                              Civic context                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A nearby point-of-interest that affects an issue's impact (U2 — Context
+ * Intelligence). Derived deterministically from Google Places + geolib.
+ */
+export interface ContextFactor {
+  /** Normalized context type: school, hospital, transit, market, government, highway, railway, residential. */
+  type: string;
+  /** Human-readable place name. */
+  name: string;
+  /** Distance from the report, in meters. */
+  distanceM: number;
+  /** Severity weight contributed by this factor. */
+  weight: number;
+}
+
 /** A single status-change record in a civic case's operational timeline. */
 export interface StatusHistoryEntry {
   status: IssueStatus;
@@ -150,6 +169,26 @@ export interface CivicReport {
   /** Optional display name when the citizen reports in identified mode (U1). */
   reporterName?: string | null;
 
+  /* ---- Context Intelligence (U2) — all optional, backward-compatible ---- */
+  /** Reverse-geocoded full address. */
+  formattedAddress?: string | null;
+  /** Reverse-geocoded locality / neighbourhood. */
+  locality?: string | null;
+  /** Reverse-geocoded district. */
+  district?: string | null;
+  /** Reverse-geocoded state. */
+  state?: string | null;
+  /** Nearby impactful places (schools, hospitals, transit, …). */
+  contextFactors?: ContextFactor[];
+  /** Deterministic, context-aware severity score (0-100). */
+  severityScore?: number;
+  /** Human severity band derived from severityScore. */
+  severityLabel?: SeverityLabel;
+  /** Human-readable reasons explaining the severity (no black box). */
+  severityReasons?: string[];
+  /** Provenance of the context data (e.g. "Google Maps Platform"). */
+  contextSource?: string | null;
+
   /** AI analysis (Phase 4). Null until analyzed / when Gemini is unconfigured. */
   aiAnalysis?: AIAnalysis | null;
 
@@ -189,6 +228,14 @@ export interface CivicCase {
 
   /** Lifecycle status of the consolidated case. */
   status: IssueStatus;
+
+  /* ---- Context Intelligence (U2) — optional, derived from members ---- */
+  /** Representative context-aware severity for the case (max of members). */
+  severityScore?: number;
+  severityLabel?: SeverityLabel;
+  /** Representative locality / district (from the first member report). */
+  locality?: string | null;
+  district?: string | null;
 
   /** Ids of the member reports. */
   reportIds: string[];
@@ -239,6 +286,10 @@ export interface CivicMapMarker {
   reportCount: number;
   /** Optional link target (e.g. the civic case detail page). */
   href?: string;
+  /** Context-aware severity band for the marker preview (U2). */
+  severityLabel?: SeverityLabel;
+  /** Locality for the marker preview (U2). */
+  locality?: string | null;
 }
 
 /* -------------------------------------------------------------------------- */

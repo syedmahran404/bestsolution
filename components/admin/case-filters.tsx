@@ -12,31 +12,39 @@ import type { CivicCase } from "@/types";
 const selectCls =
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
+const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"] as const;
+
 /**
- * Civic case management list with client-side Search & Filters (Phase 5):
- * category, status, minimum report count, and start date. Deterministic.
+ * Civic case management list with client-side Search & Filters (Phase 5 + U2):
+ * category, status, severity, locality, minimum report count, and start date.
+ * Deterministic — no API calls.
  */
 export function CaseFilters({ cases }: { cases: CivicCase[] }) {
   const [category, setCategory] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
+  const [severity, setSeverity] = useState<string>("all");
+  const [locality, setLocality] = useState<string>("");
   const [minReports, setMinReports] = useState<string>("");
   const [fromDate, setFromDate] = useState<string>("");
 
   const filtered = useMemo(() => {
     const min = minReports === "" ? 0 : Number(minReports);
     const from = fromDate ? new Date(fromDate).getTime() : null;
+    const loc = locality.trim().toLowerCase();
     return cases.filter((c) => {
       if (category !== "all" && c.category !== category) return false;
       if (status !== "all" && c.status !== status) return false;
+      if (severity !== "all" && c.severityLabel !== severity) return false;
+      if (loc && !(c.locality ?? "").toLowerCase().includes(loc)) return false;
       if (c.reportCount < min) return false;
       if (from !== null && new Date(c.createdAt).getTime() < from) return false;
       return true;
     });
-  }, [cases, category, status, minReports, fromDate]);
+  }, [cases, category, status, severity, locality, minReports, fromDate]);
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <div className="space-y-1">
           <Label
             htmlFor="filter-category"
@@ -92,6 +100,44 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             placeholder="0"
             value={minReports}
             onChange={(e) => setMinReports(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label
+            htmlFor="filter-severity"
+            className="text-xs text-muted-foreground"
+          >
+            Severity
+          </Label>
+          <select
+            id="filter-severity"
+            className={selectCls}
+            value={severity}
+            onChange={(e) => setSeverity(e.target.value)}
+          >
+            <option value="all">All severities</option>
+            {SEVERITY_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1">
+          <Label
+            htmlFor="filter-locality"
+            className="text-xs text-muted-foreground"
+          >
+            Locality
+          </Label>
+          <Input
+            id="filter-locality"
+            type="text"
+            placeholder="e.g. Koramangala"
+            value={locality}
+            onChange={(e) => setLocality(e.target.value)}
           />
         </div>
 
