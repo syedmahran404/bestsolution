@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { Activity } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { NavLinks } from "@/components/nav-links";
 
 /**
  * Top navigation bar for the Civic Operations Center.
- * Brand + primary navigation (Map / Report / My Reports).
+ * Brand + primary navigation with active-page highlighting (U5).
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-sky-500 text-white shadow-sm">
             <Activity className="h-5 w-5" />
           </div>
           <div className="leading-tight">
@@ -25,20 +28,7 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="flex items-center gap-1" aria-label="Primary">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/">Map</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/admin">Operations</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/reports">My Reports</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/report">Report issue</Link>
-          </Button>
-        </nav>
+        <NavLinks />
       </div>
     </header>
   );

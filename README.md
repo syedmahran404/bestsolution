@@ -54,6 +54,19 @@ cases** and makes the whole pipeline transparent:
 - **Status workflow** — Reported → Verified → In Progress → Resolved, with a
   status timeline; changes cascade to all member reports.
 
+## Premium Experience (U5)
+
+A polished, enterprise-grade product layer (presentation only — no logic changes):
+
+- Unified design language: brand gradient, consistent cards/shadows/radii,
+  `.glass` + `.card-hover` utilities, motion tokens.
+- Navigation with clear **active-page** highlighting + keyboard focus + `aria-current`.
+- Executive **home**: hero band, animated KPI counters, civic-health, explainable
+  insights, and a dependency-free category-distribution chart.
+- Map polish: enlarged **selected-marker** state + richer info windows.
+- Tasteful motion (fade-in, animated counters) that respects
+  `prefers-reduced-motion`.
+
 ## Civic Health & Trust (U4)
 
 The signature differentiator — Velora feels like a civic operating system:

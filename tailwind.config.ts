@@ -75,12 +75,17 @@ const config: Config = {
           "0%": { transform: "scale(0.8)", opacity: "0.8" },
           "100%": { transform: "scale(2.2)", opacity: "0" },
         },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "none" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-ring":
           "pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite",
+        "fade-in-up": "fade-in-up 0.4s ease-out both",
       },
     },
   },
