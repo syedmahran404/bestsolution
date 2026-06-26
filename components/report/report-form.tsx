@@ -1,54 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { AlertCircle, Loader2, Send, UserRound } from "lucide-react";
+import {
+  AlertCircle,
+  Loader2,
+  Send,
+  UserRound,
+  ShieldCheck,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageField } from "@/components/report/image-field";
-import { LocationField } from "@/components/report/location-field";
+import { LocationPicker } from "@/components/report/location-picker";
 import { VoiceRecorderField } from "@/components/report/voice-recorder-field";
 import { CATEGORY_META } from "@/lib/constants";
 import { isFirebaseClientConfigured } from "@/lib/firebase/client";
 import { guessExtension, uploadToStorage } from "@/lib/firebase/upload";
-import {
-  getReporterId,
-  getReporterName,
-  setReporterName,
-} from "@/lib/reporter";
+import { getReporterId } from "@/lib/reporter";
 import {
   REPORT_CATEGORIES,
   reportFormSchema,
   type ReportFormValues,
 } from "@/lib/validation/report";
+import type { IssueCategory } from "@/types";
+
+const CATEGORY_HELP: Record<IssueCategory, string> = {
+  pothole: "Road damage that risks vehicles or pedestrians.",
+  water_leak: "Pipe bursts, leaks, or wastage on public land.",
+  garbage: "Uncollected waste, dumping, or overflowing bins.",
+  streetlight: "Non-working or damaged street lighting.",
+  drainage: "Blocked drains, flooding, or open drains.",
+  other: "Something else — give it a short name below.",
+};
+
+const DRAFT_KEY = "velora.report.draft";
 
 export function ReportForm() {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [identified, setIdentified] = useState(false);
-  const [name, setName] = useState("");
 
-  // Load any saved display name (client-only; localStorage).
-  useEffect(() => {
-    const saved = getReporterName();
-    if (saved) {
-      setName(saved);
-      setIdentified(true);
-    }
-  }, []);
+  // Reporter identity (V2.1: anonymous | verified).
+  const [verified, setVerified] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+
+  // Location (address shown to user; coordinates lifted into the form).
+  const [address, setAddress] = useState<string | null>(null);
+
+  const restored = useRef(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ReportFormValues>({
     resolver: zodResolver(reportFormSchema),
@@ -61,15 +76,78 @@ export function ReportForm() {
     },
   });
 
+  const category = watch("category");
   const latitude = watch("latitude");
   const longitude = watch("longitude");
 
+  // Restore an in-progress draft (text + reporter + location; not media).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        reset({
+          title: d.title ?? "",
+          description: d.description ?? "",
+          category: d.category ?? "pothole",
+          latitude: d.latitude ?? undefined,
+          longitude: d.longitude ?? undefined,
+        });
+        if (d.verified) setVerified(true);
+        if (d.name) setName(d.name);
+        if (d.phone) setPhone(d.phone);
+        if (d.email) setEmail(d.email);
+        if (d.address) setAddress(d.address);
+      }
+    } catch {
+      /* ignore */
+    }
+    restored.current = true;
+  }, [reset]);
+
+  // Auto-save the draft on change.
+  useEffect(() => {
+    if (!restored.current) return;
+    try {
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({
+          title: watch("title"),
+          description: watch("description"),
+          category,
+          latitude,
+          longitude,
+          address,
+          verified,
+          name,
+          phone,
+          email,
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [
+    category,
+    latitude,
+    longitude,
+    address,
+    verified,
+    name,
+    phone,
+    email,
+    watch,
+  ]);
+
   async function onSubmit(values: ReportFormValues) {
     setSubmitError(null);
+    if (verified && name.trim().length < 2) {
+      setSubmitError("Please enter your name for verified reporting.");
+      return;
+    }
     try {
       let imageUrl: string | null = null;
       let audioUrl: string | null = null;
-
       if (imageFile) {
         imageUrl = await uploadToStorage(
           imageFile,
@@ -85,9 +163,6 @@ export function ReportForm() {
         );
       }
 
-      const trimmedName = identified ? name.trim() : "";
-      setReporterName(trimmedName);
-
       const res = await fetch("/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,7 +171,9 @@ export function ReportForm() {
           imageUrl,
           audioUrl,
           reporterId: getReporterId(),
-          reporterName: trimmedName || null,
+          reporterName: verified ? name.trim() || null : null,
+          reporterPhone: verified ? phone.trim() || null : null,
+          reporterEmail: verified ? email.trim() || null : null,
         }),
       });
 
@@ -104,10 +181,13 @@ export function ReportForm() {
         error?: string;
         aggregation?: { reportCount?: number };
       };
-      if (!res.ok) {
-        throw new Error(data.error ?? "Failed to submit report.");
-      }
+      if (!res.ok) throw new Error(data.error ?? "Failed to submit report.");
 
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
       const count = data.aggregation?.reportCount ?? 1;
       router.push(`/reports?submitted=1&count=${count}`);
       router.refresh();
@@ -131,60 +211,11 @@ export function ReportForm() {
         </div>
       )}
 
-      {/* Reporter identity (U1): anonymous by default, optional name */}
-      <div className="space-y-2 rounded-md border bg-muted/30 p-3">
-        <div className="flex items-center gap-1.5">
-          <UserRound className="h-4 w-4 text-muted-foreground" />
-          <Label>Reporting as</Label>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant={identified ? "outline" : "default"}
-            onClick={() => setIdentified(false)}
-          >
-            Anonymous
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={identified ? "default" : "outline"}
-            onClick={() => setIdentified(true)}
-          >
-            Add my name
-          </Button>
-        </div>
-        {identified && (
-          <Input
-            placeholder="Your name (optional)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={80}
-          />
-        )}
-        <p className="text-xs text-muted-foreground">
-          Anonymous reports never collect personal data. Either way, you can
-          track your reports on this device.
-        </p>
-      </div>
-
-      {/* Title */}
+      {/* Category — the only always-required field */}
       <div className="space-y-1.5">
-        <Label htmlFor="title">Issue title</Label>
-        <Input
-          id="title"
-          placeholder="e.g. Large pothole near the bus stop"
-          {...register("title")}
-        />
-        {errors.title && (
-          <p className="text-xs text-destructive">{errors.title.message}</p>
-        )}
-      </div>
-
-      {/* Category */}
-      <div className="space-y-1.5">
-        <Label htmlFor="category">Category</Label>
+        <Label htmlFor="category">
+          What kind of issue? <span className="text-destructive">*</span>
+        </Label>
         <select
           id="category"
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -196,18 +227,62 @@ export function ReportForm() {
             </option>
           ))}
         </select>
-        {errors.category && (
-          <p className="text-xs text-destructive">{errors.category.message}</p>
-        )}
+        <p className="text-xs text-muted-foreground">
+          {CATEGORY_HELP[category as IssueCategory]}
+        </p>
       </div>
 
-      {/* Description */}
+      {/* Title — only for "Other" */}
+      {category === "other" && (
+        <div className="space-y-1.5">
+          <Label htmlFor="title">
+            Issue name <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="title"
+            placeholder="e.g. Fallen tree blocking the footpath"
+            {...register("title")}
+          />
+          {errors.title && (
+            <p className="text-xs text-destructive">{errors.title.message}</p>
+          )}
+        </div>
+      )}
+
+      {/* Location */}
+      <LocationPicker
+        value={{
+          latitude: latitude ?? null,
+          longitude: longitude ?? null,
+          address,
+        }}
+        onChange={(v) => {
+          setValue("latitude", v.latitude ?? (undefined as unknown as number), {
+            shouldValidate: true,
+          });
+          setValue(
+            "longitude",
+            v.longitude ?? (undefined as unknown as number),
+            { shouldValidate: true },
+          );
+          setAddress(v.address);
+        }}
+        error={errors.latitude?.message ?? errors.longitude?.message}
+      />
+
+      {/* Photo */}
+      <ImageField onImageChange={setImageFile} />
+
+      {/* Voice */}
+      <VoiceRecorderField onAudioChange={setAudioBlob} />
+
+      {/* Additional details (optional) */}
       <div className="space-y-1.5">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">Additional details (optional)</Label>
         <Textarea
           id="description"
-          rows={4}
-          placeholder="Describe the issue, when you noticed it, and any safety concerns."
+          rows={3}
+          placeholder="Anything else that helps — when you noticed it, safety concerns…"
           {...register("description")}
         />
         {errors.description && (
@@ -217,28 +292,67 @@ export function ReportForm() {
         )}
       </div>
 
-      {/* Photo */}
-      <ImageField onImageChange={setImageFile} />
-
-      {/* Voice */}
-      <VoiceRecorderField onAudioChange={setAudioBlob} />
-
-      {/* Location */}
-      <LocationField
-        latitude={latitude ?? null}
-        longitude={longitude ?? null}
-        onChange={(lat, lng) => {
-          setValue("latitude", lat ?? (undefined as unknown as number), {
-            shouldValidate: true,
-          });
-          setValue("longitude", lng ?? (undefined as unknown as number), {
-            shouldValidate: true,
-          });
-        }}
-        error={
-          errors.latitude?.message ?? errors.longitude?.message ?? undefined
-        }
-      />
+      {/* Reporter identity */}
+      <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+        <div className="flex items-center gap-1.5">
+          <UserRound className="h-4 w-4 text-muted-foreground" />
+          <Label>Reporting as</Label>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={verified ? "outline" : "default"}
+            onClick={() => setVerified(false)}
+          >
+            Anonymous
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={verified ? "default" : "outline"}
+            onClick={() => setVerified(true)}
+          >
+            <ShieldCheck className="mr-1.5 h-4 w-4" />
+            Verified citizen
+          </Button>
+        </div>
+        {verified ? (
+          <div className="space-y-2">
+            <Input
+              placeholder="Your name *"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={80}
+            />
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Input
+                placeholder="Phone (optional)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                maxLength={20}
+              />
+              <Input
+                placeholder="Email (optional)"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                maxLength={120}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Optional contact lets authorities follow up with you for details
+              or confirmation — it speeds up investigation. It is never shown
+              publicly.
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Anonymous reports never collect personal data. You can still track
+            them on this device.
+          </p>
+        )}
+      </div>
 
       {submitError && (
         <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

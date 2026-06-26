@@ -85,9 +85,12 @@ Velora takes an issue from report to resolution:
 
 - Interactive **India civic map** (aggregated cases as numbered bubbles, single
   reports as pins; status colors; selected-marker state).
-- **Citizen reporting**: photo upload, **voice record/upload**, one-tap
-  geolocation (+ manual fallback); anonymous or identified; device-scoped
-  "My Reports".
+- **Citizen reporting**: **category-first** flow (category is the only required
+  field), optional details, photo, **voice record/upload**. **Location by
+  address search or one-tap GPS** — reverse-geocoded, so citizens never see or
+  type coordinates (manual entry stays a collapsed fallback). **Anonymous or
+  Verified Citizen** (optional name/phone/email for follow-up); drafts
+  auto-save; device-scoped "My Reports".
 - **Visible AI reasoning** per report; **AI case summaries** + **agentic
   operations brief** with confidence and trust indicators.
 - **Deterministic aggregation engine** with a keyword false-merge guard.

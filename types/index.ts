@@ -303,6 +303,10 @@ export interface CivicReport {
   /** Optional display name when the citizen reports in identified mode (U1). */
   reporterName?: string | null;
 
+  /** Optional contact details for verified reporting (V2.1). */
+  reporterPhone?: string | null;
+  reporterEmail?: string | null;
+
   /* ---- Context Intelligence (U2) — all optional, backward-compatible ---- */
   /** Reverse-geocoded full address. */
   formattedAddress?: string | null;
