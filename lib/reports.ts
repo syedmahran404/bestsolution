@@ -33,6 +33,8 @@ export async function createReport(
     longitude: input.longitude,
     status: "reported",
     civicCaseId: null,
+    reporterId: input.reporterId ?? null,
+    reporterName: input.reporterName ?? null,
     createdAt: new Date().toISOString(),
   };
 
@@ -70,7 +72,7 @@ export async function submitReport(input: CreateReportInput): Promise<{
   };
 }
 
-/** List reports, newest first. */
+/** List reports, newest first. Admin-wide view (all reporters). */
 export async function listReports(max = 50): Promise<CivicReport[]> {
   const db = getAdminDb();
   const snapshot = await db
@@ -80,4 +82,26 @@ export async function listReports(max = 50): Promise<CivicReport[]> {
     .get();
 
   return snapshot.docs.map((doc) => doc.data() as CivicReport);
+}
+
+/**
+ * List only the reports submitted by a given anonymous reporter (U1).
+ * Powers the isolated "My Reports" view. Sorted in memory to avoid requiring
+ * a composite Firestore index.
+ */
+export async function listReportsByReporter(
+  reporterId: string,
+  max = 50,
+): Promise<CivicReport[]> {
+  if (!reporterId) return [];
+  const db = getAdminDb();
+  const snapshot = await db
+    .collection(COLLECTIONS.reports)
+    .where("reporterId", "==", reporterId)
+    .limit(max)
+    .get();
+
+  return snapshot.docs
+    .map((doc) => doc.data() as CivicReport)
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }

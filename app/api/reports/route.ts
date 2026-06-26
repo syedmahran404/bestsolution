@@ -11,8 +11,13 @@
 import { NextResponse } from "next/server";
 
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
-import { listReports, submitReport } from "@/lib/reports";
+import {
+  listReports,
+  listReportsByReporter,
+  submitReport,
+} from "@/lib/reports";
 import { createReportSchema } from "@/lib/validation/report";
+import type { CivicReport } from "@/types";
 
 // Reports are user data that must never be statically cached.
 export const dynamic = "force-dynamic";
@@ -59,13 +64,27 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!isFirebaseAdminConfigured) {
     return NextResponse.json({ reports: [] }, { status: 200 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const reporterId = searchParams.get("reporterId");
+  const scope = searchParams.get("scope");
+
   try {
-    const reports = await listReports();
+    // Citizen view: must pass reporterId → only their own reports (U1).
+    // Admin-wide view: explicit scope=all.
+    let reports: CivicReport[];
+    if (scope === "all") {
+      reports = await listReports();
+    } else if (reporterId) {
+      reports = await listReportsByReporter(reporterId);
+    } else {
+      // No identity and no admin scope → never leak all reports.
+      reports = [];
+    }
     return NextResponse.json({ reports }, { status: 200 });
   } catch (err) {
     console.error("[api/reports] list failed:", err);

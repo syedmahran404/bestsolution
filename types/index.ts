@@ -141,6 +141,15 @@ export interface CivicReport {
   /** Linked civic case id (set by the Phase 3 aggregation engine). */
   civicCaseId?: string | null;
 
+  /**
+   * Anonymous, client-generated reporter id (U1). Scopes "My Reports" to the
+   * submitting device. Optional for backward compatibility with legacy reports.
+   */
+  reporterId?: string | null;
+
+  /** Optional display name when the citizen reports in identified mode (U1). */
+  reporterName?: string | null;
+
   /** AI analysis (Phase 4). Null until analyzed / when Gemini is unconfigured. */
   aiAnalysis?: AIAnalysis | null;
 
@@ -183,6 +192,14 @@ export interface CivicCase {
 
   /** Ids of the member reports. */
   reportIds: string[];
+
+  /**
+   * Representative signal keywords from member reports (U1 false-merge guard).
+   * Used to keep distinct nearby same-category issues from merging. Optional
+   * for backward compatibility — legacy cases without it fall back to
+   * geo-only matching.
+   */
+  keywords?: string[];
 
   /** Status change history (Phase 5 — operations timeline). */
   statusHistory?: StatusHistoryEntry[];
