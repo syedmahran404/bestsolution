@@ -2,190 +2,176 @@
 
 **An AI Civic Operations Center — from issue reporting to issue resolution.**
 
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-8E44EC)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Storage-orange)
+![Google Maps](https://img.shields.io/badge/Google%20Maps-Platform-34A853)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 Built for the **Coding Ninjas × Google — Vibe2Ship** Hackathon
 (Problem Statement #2 — _Community Hero: Hyperlocal Problem Solver_).
 
 Velora is not a complaint form. It is an AI-powered civic intelligence platform:
-citizens report issues by photo or voice, AI explains its understanding, the
-system **aggregates many reports into one undeniable civic case**, and an
-operations center tracks every case to resolution.
+citizens report issues (by photo or voice, in any language), AI explains its
+understanding, a deterministic engine **aggregates many reports into one
+undeniable civic case**, and an operations center prioritizes and tracks each
+case to resolution — with a living **Civic Health Index** for the whole city.
+
+---
+
+## Table of Contents
+
+- [Problem Statement](#problem-statement)
+- [Solution](#solution)
+- [Why This Is Different](#why-this-is-different)
+- [Features](#features)
+- [Architecture](#architecture)
+- [AI Workflow](#ai-workflow)
+- [Technology Stack](#technology-stack)
+- [Google Technologies](#google-technologies)
+- [Screenshots & Demo](#screenshots--demo)
+- [Installation](#installation)
+- [Environment Setup](#environment-setup)
+- [Deployment](#deployment)
+- [Project Structure](#project-structure)
+- [Performance](#performance)
+- [Accessibility](#accessibility)
+- [Security](#security)
+- [Judging Criteria Mapping](#judging-criteria-mapping)
+- [Future Roadmap](#future-roadmap)
+- [License & Acknowledgements](#license--acknowledgements)
 
 ---
 
 ## Problem Statement
 
-Communities face everyday civic problems — potholes, water leaks, broken
-streetlights, garbage, drainage. Existing reporting is **fragmented**, **opaque**,
-**hard to track**, and **slow to resolve**. Crucially, a single citizen complaint
-carries little weight and is easily lost in a queue.
+Communities face constant hyperlocal problems — potholes, water leaks, broken
+streetlights, garbage, drainage. Existing reporting is **fragmented**,
+**opaque**, **hard to track**, and **slow to resolve**. A single citizen
+complaint carries little weight and is easily lost. Citizens lack a way to turn
+scattered voices into collective, undeniable pressure — and authorities lack a
+clear, prioritized operating picture.
 
-## Solution Overview
+## Solution
 
-Velora turns scattered individual reports into **structured, prioritized civic
-cases** and makes the whole pipeline transparent:
+Velora takes an issue from report to resolution:
 
-1. **Report** — a citizen submits an issue (photo or voice, with location).
-2. **Understand** — Gemini classifies the issue and **explains its reasoning**
-   (no black box), transcribing voice notes in any language.
-3. **Aggregate** — a deterministic engine merges nearby same-category reports
+1. **Report** — a citizen submits an issue with a photo or **voice note (any
+   language)** and a location. Anonymous by default; optional identity.
+2. **Understand** — Gemini classifies the issue and **shows its reasoning**
+   (category, confidence, keywords, transcript).
+3. **Contextualize** — Geocoding + Places compute an **explainable,
+   context-aware severity** (e.g. "within 40m of a hospital: +25").
+4. **Aggregate** — a deterministic engine merges nearby same-category reports
    into one **civic case** (duplicate detection without AI/embeddings).
-4. **Operate** — an operations center prioritizes cases, tracks a status
-   workflow, and surfaces deterministic intelligence.
+5. **Operate** — an explainable **agentic operations brief**, priority,
+   recommendations, status workflow, and a **Civic Health Index**.
 
-## Key Features
+## Why This Is Different
 
-- **Interactive India map** — civic cases as numbered bubbles, single reports as
-  pins; red/amber/green status colors.
-- **Citizen reporting** — title, description, category, **photo upload**,
-  **voice recording/upload**, one-tap **geolocation** (manual fallback).
-  Anonymous by default (no PII); optional named/"identified" reporting. Your
-  reports are scoped to your device under **My Reports**.
-- **Visible AI reasoning** — category, confidence, reasoning, keywords, summary,
-  and voice transcript shown for every report.
-- **Context-aware severity (U2)** — reverse-geocoded location + nearby places
-  (schools, hospitals, transit…) produce an explainable severity score with
-  human-readable reasons. Shown on a context card.
-- **Aggregation engine** — deterministic geospatial clustering into civic cases.
-- **AI case intelligence** — concise case summary + community-impact line.
-- **Operations Center** — KPI dashboard, most-reported categories, largest cases,
-  active clusters, recent activity.
-- **Case management** — search & filters (category, status, severity, locality,
-  report count, date).
-- **Status workflow** — Reported → Verified → In Progress → Resolved, with a
-  status timeline; changes cascade to all member reports.
+- **It reasons and explains, never a black box.** Every AI output shows inputs,
+  reasoning, confidence, and sources; priority is deterministic and transparent.
+- **Aggregation moat.** Many weak reports become one undeniable, prioritized
+  civic case.
+- **Context-aware severity.** Severity is computed from real urban context
+  (schools, hospitals, transit) via Google Places — not guessed.
+- **Civic Health Index.** A living, deterministic 0-100 score per city /
+  category / ward — a memorable, accountable headline metric.
+- **Token-disciplined AI.** Gemini is the perception layer only; clustering,
+  severity, priority, health, and analytics are all deterministic and cached.
 
-## Premium Design System (U5.1)
+## Features
 
-A distinctive, token-driven visual identity (presentation only — no logic changes):
-
-- **Refined design tokens**: premium light palette (deep ink, cool near-white,
-  signature violet focus ring) + a polished dark palette; softer radii.
-- **Ambient identity**: subtle environmental glow, layered `shadow-soft` /
-  `shadow-elevated` tokens applied through the base `Card` primitive.
-- **Primitive physics**: button press (active scale), shimmer skeletons,
-  scale-in / fade-in motion tokens — all respecting `prefers-reduced-motion`.
-- **Theme toggle**: light/dark switch in the header; initial theme follows OS
-  preference (dark-first for dark-OS users) and persists, with no flash.
-- Cohesion comes from the token + primitive layer, so every screen inherits the
-  identity consistently.
-
-## Premium Experience (U5)
-
-A polished, enterprise-grade product layer (presentation only — no logic changes):
-
-- Unified design language: brand gradient, consistent cards/shadows/radii,
-  `.glass` + `.card-hover` utilities, motion tokens.
-- Navigation with clear **active-page** highlighting + keyboard focus + `aria-current`.
-- Executive **home**: hero band, animated KPI counters, civic-health, explainable
-  insights, and a dependency-free category-distribution chart.
-- Map polish: enlarged **selected-marker** state + richer info windows.
-- Tasteful motion (fade-in, animated counters) that respects
-  `prefers-reduced-motion`.
-
-## Civic Health & Trust (U4)
-
-The signature differentiator — Velora feels like a civic operating system:
-
-- **Civic Health Index**: a living, deterministic 0-100 score for the city, with
-  per-category and per-ward breakdowns, color-coded **trend** (rising / improving
-  / stable / critical), and a fully explainable factor list. No Gemini.
-- **Explainable civic insights**: deterministic cards (e.g. "Water leak reports
-  increased 32% this week") each showing **why** and **how** it was calculated.
-- **Community impact** (per case): people/schools/hospitals/transit/businesses
-  nearby + impact radius, estimated deterministically from the context engine.
-- **Trust indicators** on every intelligence surface: deterministic vs AI-assisted,
-  cached, confidence, and data sources.
-- **Decision transparency panel**: the exact inputs, weights, and contributions
-  behind each priority + recommendation — judge-facing, no black box.
-- **Executive dashboard**: health, critical load, resolution rate, average
-  resolution time, activity — all deterministic.
-
-## Operations Intelligence (U3)
-
-Velora behaves like a real civic operations center — explainable, never a black box:
-
-- **AI Operations Brief** per case (current issue, root cause, impact, why it
-  matters, next actions with reasons, dependencies, risks) — one cached Gemini
-  call per case, deterministic fallback when unconfigured.
-- **Explainable priority** (deterministic score + confidence + reasons +
-  affected-population estimate + nearby landmarks) and a **recommendation engine**
-  (inspect / verify / dispatch / coordinate / monitor / await / escalate / close)
-  that always shows its reasoning.
-- **Operations timeline** and an upgraded dashboard (highest-priority queue, most
-  affected localities/districts, recently escalated, fastest-growing cluster,
-  daily/weekly activity). All analytics are deterministic — no Gemini.
+- Interactive **India civic map** (aggregated cases as numbered bubbles, single
+  reports as pins; status colors; selected-marker state).
+- **Citizen reporting**: photo upload, **voice record/upload**, one-tap
+  geolocation (+ manual fallback); anonymous or identified; device-scoped
+  "My Reports".
+- **Visible AI reasoning** per report; **AI case summaries** + **agentic
+  operations brief** with confidence and trust indicators.
+- **Deterministic aggregation engine** with a keyword false-merge guard.
+- **Context intelligence**: reverse-geocoded locality + nearby landmarks →
+  explainable severity.
+- **Operations Center**: priority queue, status workflow (Reported → Verified →
+  In Progress → Resolved), operations timeline, decision-transparency panel.
+- **Civic Health Index** + explainable insights + community-impact estimates.
+- **Premium experience**: design system, light/dark theme, animated metrics,
+  motion that respects `prefers-reduced-motion`.
 
 ## Architecture
 
 ```
-Next.js 14 (App Router, RSC)            ── one app, one Vercel deploy
- ├─ Client components: map, report form, voice recorder, filters, status mgr
+Next.js 14 (App Router, RSC)              ── one app, one Vercel deploy
+ ├─ Client: map, report form, voice recorder, filters, status mgr, theme
  ├─ Server components: home, admin, case detail, my reports
- └─ Route Handlers (/api): reports, cases, case status
+ └─ Route Handlers (/api): reports, cases, case status, agent
         │
-        ├─ Gemini 2.5 Flash  ── perception ONLY (classify, transcribe, reason, summarize)
-        ├─ Deterministic core ── distance, clustering, aggregation, insights (no AI)
-        ├─ Firebase Firestore ── reports, civicCases
-        ├─ Firebase Storage   ── photos, voice notes
-        └─ Google Maps        ── interactive map + markers
+        ├─ Gemini 2.5 Flash    ── PERCEPTION ONLY (classify, transcribe, reason, summarize)
+        ├─ Deterministic core  ── distance, clustering, severity, priority, health, insights
+        ├─ Google Maps Platform── map + Geocoding + Places (context)
+        ├─ Firebase Firestore  ── reports, civicCases
+        └─ Firebase Storage    ── photos, voice notes
 ```
 
 **Design principle:** Gemini is used **only** for perception. All distance,
-clustering, aggregation, and analytics are deterministic — fast, free, and
-demo-stable. AI outputs are cached (report analysis is immutable; case summaries
-are cached by report count) to minimize token usage.
-
-## Tech Stack
-
-| Layer    | Choice                                    |
-| -------- | ----------------------------------------- |
-| Frontend | Next.js 14 (App Router), TypeScript       |
-| UI       | Tailwind CSS, shadcn/ui, lucide-react     |
-| Backend  | Next.js Route Handlers                    |
-| Database | Firebase Firestore                        |
-| Storage  | Firebase Storage                          |
-| Maps     | Google Maps (`@vis.gl/react-google-maps`) |
-| AI       | Gemini 2.5 Flash (Google AI Studio)       |
-| Forms    | React Hook Form + Zod                     |
-| Geo      | geolib (haversine distance)               |
-| Deploy   | Vercel                                    |
-
-## Google Technologies Used
-
-- **Gemini 2.5 Flash** (via Google AI Studio) — multimodal classification,
-  voice transcription, reasoning, and case summaries.
-- **Google Maps Platform** — the interactive India civic map, plus the
-  **Geocoding API** (reverse-geocoded localities) and **Places API** (nearby
-  context for explainable severity) used by U2 Context Intelligence.
-- **Firebase** (Firestore + Storage) — data and media persistence.
+clustering, aggregation, severity, priority, health, and analytics are
+deterministic — fast, free, explainable, and demo-stable. AI outputs are cached
+(report analysis is immutable; case summaries/briefs are cached by state).
 
 ## AI Workflow
 
 ```
-Report submitted (photo/voice + text + location)
+Report (photo/voice + text + location)
    │
-   ├─ ONE Gemini multimodal call ─▶ { category, confidence, reasoning,
-   │                                  keywords, summary, transcript }
-   │      (stored immutably on the report — never re-called)
-   │
-   ├─ Deterministic aggregation ─▶ attach to nearest same-category case
-   │      within 150m, or create a new case (running-average centroid)
-   │
-   └─ On case view ─▶ cached AI case summary + community impact
-          (regenerated only when the case grows; deterministic fallback)
+   ├─ ONE Gemini multimodal call ─▶ { category, confidence, reasoning, keywords,
+   │                                  summary, transcript }   (cached on report)
+   ├─ Deterministic context (Maps) ─▶ address + nearby places ─▶ explainable severity
+   ├─ Deterministic aggregation ─▶ attach to nearest same-category case (≤150m) or create
+   └─ On case view ─▶ cached AI summary + agentic operations brief
+                       (deterministic priority/recommendation/timeline)
 ```
 
-Robustness: if a voice format is unsupported, analysis retries text-only so
-classification still succeeds. If Gemini is unconfigured, reports still submit
-and aggregate (analysis simply omitted).
+Robustness: unsupported audio falls back to text-only analysis; if Gemini is
+unconfigured, reports still submit, aggregate, and get deterministic briefs.
 
----
+## Technology Stack
+
+| Layer    | Choice                                         |
+| -------- | ---------------------------------------------- |
+| Frontend | Next.js 14 (App Router), TypeScript            |
+| UI       | Tailwind CSS, shadcn/ui, lucide-react          |
+| Backend  | Next.js Route Handlers                         |
+| Database | Firebase Firestore                             |
+| Storage  | Firebase Storage                               |
+| Maps     | Google Maps Platform (Maps, Geocoding, Places) |
+| AI       | Gemini 2.5 Flash (Google AI Studio)            |
+| Forms    | React Hook Form + Zod                          |
+| Geo      | geolib (haversine distance)                    |
+| Deploy   | Vercel                                         |
+
+## Google Technologies
+
+- **Gemini 2.5 Flash** (via Google AI Studio) — multimodal classification, voice
+  transcription, reasoning, case summaries, and the agentic operations brief.
+- **Google Maps Platform** — interactive map + **Geocoding API** (localities) +
+  **Places API** (nearby context for explainable severity).
+- **Firebase** (Firestore + Storage) — data and media persistence.
+
+## Screenshots & Demo
+
+> Add before submission:
+>
+> - `docs/screenshots/` — home (Civic Health Index), case detail (AI brief +
+>   transparency), operations dashboard, report flow.
+> - Demo GIF / video link.
+> - Live deployment URL.
 
 ## Installation
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in the values (see below)
+cp .env.example .env.local   # fill in keys (see Environment Setup)
 npm run dev                  # http://localhost:3000
 ```
 
@@ -202,16 +188,17 @@ npm run check:gemini # validate the live Gemini classification path
 
 ## Environment Setup
 
-Copy `.env.example` → `.env.local` and provide:
+Copy `.env.example` → `.env.local`:
 
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — Google Maps JavaScript API key
-- `GEMINI_API_KEY` — from Google AI Studio
-- `NEXT_PUBLIC_FIREBASE_*` — Firebase web app config (client)
-- `FIREBASE_SERVICE_ACCOUNT_KEY` — base64 or raw service-account JSON (server)
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — Maps JavaScript API (client)
+- `GOOGLE_MAPS_SERVER_KEY` — Geocoding + Places (server; falls back to public key)
+- `GEMINI_API_KEY` — Google AI Studio (server)
+- `NEXT_PUBLIC_FIREBASE_*` — Firebase web config (client)
+- `FIREBASE_SERVICE_ACCOUNT_KEY` — base64/JSON service account (server)
 - `FIREBASE_STORAGE_BUCKET` — e.g. `your-project.appspot.com`
 
-The app degrades gracefully when keys are missing (map shows a placeholder /
-demo data; AI features are skipped).
+The app degrades gracefully when keys are missing (map placeholder / demo data;
+AI features skipped).
 
 ### Firebase rules (demo)
 
@@ -220,34 +207,67 @@ demo data; AI features are skipped).
 match /reports/{allPaths=**} { allow read, write: if true; }
 ```
 
-Firestore `reports` / `civicCases` are written server-side via the Admin SDK.
-
-## Deployment (Vercel)
+## Deployment
 
 1. Push to GitHub and import the repo into Vercel (Next.js auto-detected).
 2. Add every variable from `.env.example` under **Settings → Environment
-   Variables**.
-3. Deploy. No extra configuration required (`package-lock.json` ensures
-   reproducible installs).
+   Variables**; enable the **Geocoding API + Places API** on the Maps key.
+3. Deploy. `package-lock.json` ensures reproducible installs.
 
 ## Project Structure
 
 ```
 app/         routes (home, report, reports, cases/[id], admin, admin/cases) + /api
-components/  ui/ (shadcn), map/, report/, ai/, cases/, admin/
-lib/         aggregation, civic-cases, insights, reports, constants, ai/, firebase/, gemini/
+components/  ui/ (shadcn), map/, report/, ai/, cases/, operations/, health/,
+             civic/, trust/, admin/, nav, theme
+lib/         aggregation, civic-cases, context, operations, civic-health,
+             civic-insights, insights, reports, constants, ai/, firebase/, gemini/
 types/       domain models
 scripts/     seed.ts, check-gemini.mjs
 docs/        hackathon submission content
 ```
 
-## Future Scope
+## Performance
 
-- Department routing & resolution recommendations (AI-assisted).
-- Authenticated citizen/admin roles.
-- Temporal auto-escalation of unresolved cases.
-- Multilingual UI and SLA accountability scoreboards.
+- Gemini calls are minimized and cached (one perception call per report,
+  immutable; briefs/summaries cached by state). Deterministic core adds no
+  network cost.
+- Single-field Firestore queries with in-memory sorts (no composite indexes).
+- Lazy-loaded recorder, lazy images, SVG markers, GPU-friendly motion.
 
----
+## Accessibility
 
-_Built with Google AI Studio (Gemini), Google Maps, and Firebase._
+- Keyboard navigation with `aria-current` on the active nav and visible focus
+  rings; `prefers-reduced-motion` honored; labeled form controls; map region
+  labeled; semantic structure throughout.
+
+## Security
+
+See [SECURITY.md](./SECURITY.md). No secrets in the repo; server-only secrets
+are `"server-only"`-guarded; report input is Zod-validated; external calls fail
+open.
+
+## Judging Criteria Mapping
+
+| Criterion (weight)             | Where Velora delivers                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| Problem Solving & Impact (20%) | Aggregation + vernacular voice + context-aware severity + Civic Health Index        |
+| Agentic Depth (20%)            | Agentic operations brief, deterministic priority + recommendations + timeline       |
+| Innovation (20%)               | Context-aware explainable severity, collective-case aggregation, Civic Health Index |
+| Google Technologies (15%)      | Gemini 2.5 Flash + Maps + Geocoding + Places + Firebase                             |
+| Product & Design (10%)         | Premium design system, light/dark theme, cohesive UX                                |
+| Technical Implementation (10%) | Typed, modular, token-disciplined, deterministic-first                              |
+| Completeness & Usability (5%)  | Full lifecycle report → resolution + admin operations                               |
+
+## Future Roadmap
+
+- Department routing, notifications, and one-tap escalation (clean seams exist).
+- Authenticated roles; real-time dashboards; temporal auto-escalation.
+- Full dark-mode component audit; report stepper; admin mission-control layout.
+
+## License & Acknowledgements
+
+- **License:** [MIT](./LICENSE)
+- **Built with:** Google AI Studio (Gemini), Google Maps Platform, Firebase,
+  Next.js, Tailwind, shadcn/ui.
+- See [CHANGELOG.md](./CHANGELOG.md) and [CONTRIBUTING.md](./CONTRIBUTING.md).
