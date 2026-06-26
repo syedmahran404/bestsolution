@@ -20,9 +20,18 @@ export const metadata = {
 export default function ReportsPage({
   searchParams,
 }: {
-  searchParams?: { submitted?: string };
+  searchParams?: { submitted?: string; count?: string };
 }) {
   const justSubmitted = searchParams?.submitted === "1";
+  const voiceCount = Number(searchParams?.count ?? "1");
+  const ordinal =
+    voiceCount === 1
+      ? "1st"
+      : voiceCount === 2
+        ? "2nd"
+        : voiceCount === 3
+          ? "3rd"
+          : `${voiceCount}th`;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -33,7 +42,9 @@ export default function ReportsPage({
           <div className="mb-4 flex items-center gap-2 rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-800">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             <p>
-              Report submitted and analyzed. It has been added to a civic case.
+              {voiceCount > 1
+                ? `Report submitted — you're the ${ordinal} voice on this issue. Your report strengthened an existing civic case, making it harder to ignore.`
+                : "Report submitted and analyzed. It has started a new civic case."}
             </p>
           </div>
         )}

@@ -42,6 +42,10 @@ export interface OperationsMetrics {
   dailyActiveCount: number;
   weeklyActiveCount: number;
   avgClusterSize: number;
+  /* ---- U4 accountability (additive) ---- */
+  overdueCount: number;
+  createdToday: number;
+  resolvedToday: number;
 }
 
 /**
@@ -102,6 +106,15 @@ export function computeOperationsMetrics(
 
   const fastestGrowing = byCount.filter((c) => c.reportCount > 1)[0] ?? null;
 
+  // U4 accountability: overdue = open case older than 7 days; today counters.
+  const overdueCount = cases.filter(
+    (c) => c.status !== "resolved" && !within(c.createdAt, 24 * 7),
+  ).length;
+  const createdToday = cases.filter((c) => within(c.createdAt, 24)).length;
+  const resolvedToday = cases.filter(
+    (c) => c.status === "resolved" && within(c.updatedAt, 24),
+  ).length;
+
   return {
     totalReports,
     totalCases,
@@ -119,5 +132,8 @@ export function computeOperationsMetrics(
     weeklyActiveCount: cases.filter((c) => within(c.updatedAt, 24 * 7)).length,
     avgClusterSize:
       totalCases === 0 ? 0 : Number((totalReports / totalCases).toFixed(1)),
+    overdueCount,
+    createdToday,
+    resolvedToday,
   };
 }

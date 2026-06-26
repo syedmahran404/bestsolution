@@ -61,6 +61,8 @@ export default async function HomePage() {
         lat: i.location.lat,
         lng: i.location.lng,
         reportCount: 1,
+        severityLabel: i.severityLabel,
+        locality: i.location.city ?? null,
       }));
 
   const metrics = usingLiveData

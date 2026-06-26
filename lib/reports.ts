@@ -8,7 +8,7 @@
  */
 import "server-only";
 
-import { COLLECTIONS } from "@/lib/constants";
+import { CATEGORY_META, COLLECTIONS } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { aggregateReport, type AggregationResult } from "@/lib/aggregation";
 import { analyzeReport } from "@/lib/ai/analysis";
@@ -25,8 +25,9 @@ export async function createReport(
 
   const report: CivicReport = {
     id: ref.id,
-    title: input.title,
-    description: input.description,
+    // V2.1: title is optional except for "other"; default to the category label.
+    title: input.title?.trim() || CATEGORY_META[input.category].label,
+    description: input.description?.trim() ?? "",
     category: input.category,
     imageUrl: input.imageUrl ?? null,
     audioUrl: input.audioUrl ?? null,
@@ -36,6 +37,8 @@ export async function createReport(
     civicCaseId: null,
     reporterId: input.reporterId ?? null,
     reporterName: input.reporterName ?? null,
+    reporterPhone: input.reporterPhone ?? null,
+    reporterEmail: input.reporterEmail ?? null,
     createdAt: new Date().toISOString(),
   };
 

@@ -1,14 +1,18 @@
 import { z } from "zod";
 
 /**
- * Validation schema for creating a citizen report (Phase 2).
+ * Validation schema for creating a citizen report.
  *
- * Shared by the client form (react-hook-form via @hookform/resolvers) AND the
- * server Route Handler, so the same rules are enforced in both places — no
- * drift between client and server validation.
+ * Shared by the client form (react-hook-form) AND the server Route Handler.
+ *
+ * V2.1 reporting UX:
+ *  - category is the only always-required field.
+ *  - title is optional and only REQUIRED when category === "other"
+ *    (an explicit "issue name"); otherwise it is derived from the category.
+ *  - description is optional ("additional details").
+ *  - reporter contact (name/phone/email) is optional (verified mode).
  */
 
-/** Category values kept in sync with the IssueCategory type. */
 export const REPORT_CATEGORIES = [
   "pothole",
   "water_leak",
@@ -18,50 +22,74 @@ export const REPORT_CATEGORIES = [
   "other",
 ] as const;
 
-export const createReportSchema = z.object({
+/** Base object (no refinements) so it can be `.pick`-ed for the form schema. */
+const reportBaseSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(3, "Title must be at least 3 characters")
-    .max(120, "Title must be 120 characters or fewer"),
+    .max(120, "Title must be 120 characters or fewer")
+    .optional(),
   description: z
     .string()
     .trim()
-    .min(5, "Description must be at least 5 characters")
-    .max(1000, "Description must be 1000 characters or fewer"),
+    .max(1000, "Description must be 1000 characters or fewer")
+    .optional(),
   category: z.enum(REPORT_CATEGORIES, {
     errorMap: () => ({ message: "Select a valid category" }),
   }),
   latitude: z
-    .number({ invalid_type_error: "Latitude is required" })
+    .number({ invalid_type_error: "Pick a location" })
     .min(-90, "Invalid latitude")
     .max(90, "Invalid latitude"),
   longitude: z
-    .number({ invalid_type_error: "Longitude is required" })
+    .number({ invalid_type_error: "Pick a location" })
     .min(-180, "Invalid longitude")
     .max(180, "Invalid longitude"),
   imageUrl: z.string().url("Invalid image URL").nullable().optional(),
   audioUrl: z.string().url("Invalid audio URL").nullable().optional(),
-  /** Anonymous reporter id (U1). Optional for backward compatibility. */
   reporterId: z.string().trim().min(1).max(64).nullable().optional(),
-  /** Optional display name for identified reporting (U1). */
   reporterName: z.string().trim().max(80).nullable().optional(),
+  reporterPhone: z.string().trim().max(20).nullable().optional(),
+  reporterEmail: z
+    .string()
+    .trim()
+    .max(120)
+    .nullable()
+    .optional()
+    .refine(
+      (v) => !v || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v),
+      "Enter a valid email",
+    ),
 });
 
-/** Server-side input (after media has been uploaded to Storage). */
+/** "Other" requires an explicit issue name (title). */
+function requireTitleForOther(
+  val: { category: string; title?: string },
+  ctx: z.RefinementCtx,
+) {
+  if (val.category === "other" && (!val.title || val.title.trim().length < 3)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["title"],
+      message: "Issue name is required for 'Other' (min 3 characters)",
+    });
+  }
+}
+
+export const createReportSchema =
+  reportBaseSchema.superRefine(requireTitleForOther);
+
 export type CreateReportInput = z.infer<typeof createReportSchema>;
 
-/**
- * Client form values. Title/description/category/coords are validated by the
- * form; media files are handled as separate React state and uploaded to
- * Storage before the validated payload is sent to the API.
- */
-export const reportFormSchema = createReportSchema.pick({
-  title: true,
-  description: true,
-  category: true,
-  latitude: true,
-  longitude: true,
-});
+/** Client form values (media + reporter contact handled outside RHF). */
+export const reportFormSchema = reportBaseSchema
+  .pick({
+    title: true,
+    description: true,
+    category: true,
+    latitude: true,
+    longitude: true,
+  })
+  .superRefine(requireTitleForOther);
 
 export type ReportFormValues = z.infer<typeof reportFormSchema>;

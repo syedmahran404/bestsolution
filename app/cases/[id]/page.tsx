@@ -12,6 +12,7 @@ import { OperationsBriefPanel } from "@/components/operations/operations-brief-p
 import { PriorityPanel } from "@/components/operations/priority-panel";
 import { TransparencyPanel } from "@/components/operations/transparency-panel";
 import { OperationsTimeline } from "@/components/operations/operations-timeline";
+import { EscalationCard } from "@/components/cases/escalation-card";
 import { StatusManager } from "@/components/cases/status-manager";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,7 @@ import {
   recommendAction,
 } from "@/lib/operations";
 import { explainLinkage } from "@/lib/insights";
+import { buildEscalationDraft } from "@/lib/escalation";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import {
   Users,
@@ -83,6 +85,7 @@ export default async function CaseDetailPage({
   );
   const timeline = buildOperationsTimeline(civicCase, reports);
   const impact = computeCaseCommunityImpact(civicCase, reports);
+  const escalation = buildEscalationDraft(civicCase, reports, priority);
 
   const markers: CivicMapMarker[] = reports.map((r) => ({
     id: r.id,
@@ -306,6 +309,9 @@ export default async function CaseDetailPage({
             </CardContent>
           </Card>
         </div>
+
+        {/* U4: one-tap escalation */}
+        <EscalationCard draft={escalation} />
 
         {/* Member report locations */}
         <section className="space-y-2">

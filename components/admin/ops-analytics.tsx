@@ -13,16 +13,22 @@ export function OpsAnalytics({ metrics }: { metrics: OperationsMetrics }) {
   return (
     <div className="space-y-6">
       {/* Activity chips */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Chip
           icon={Activity}
           label="Active today"
           value={metrics.dailyActiveCount}
         />
+        <Chip icon={Activity} label="New today" value={metrics.createdToday} />
         <Chip
           icon={Activity}
-          label="Active this week"
-          value={metrics.weeklyActiveCount}
+          label="Resolved today"
+          value={metrics.resolvedToday}
+        />
+        <Chip
+          icon={TrendingUp}
+          label="Overdue (>7d)"
+          value={metrics.overdueCount}
         />
         <Chip
           icon={Layers}

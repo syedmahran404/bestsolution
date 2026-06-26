@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
+import { OpsAgent } from "@/components/ai/ops-agent";
 import { OpsMetrics } from "@/components/admin/ops-metrics";
 import { OpsAnalytics } from "@/components/admin/ops-analytics";
 import { ExecutiveMetrics } from "@/components/admin/executive-metrics";
@@ -84,6 +85,8 @@ export default async function AdminPage() {
           </Card>
         ) : (
           <>
+            <OpsAgent />
+
             <HealthIndex overview={healthOverview} />
 
             <ExecutiveMetrics

@@ -67,6 +67,19 @@ export const CATEGORY_META: Record<
 /** Default Gemini model for all multimodal perception (used from Phase 2). */
 export const GEMINI_MODEL = "gemini-2.5-flash";
 
+/**
+ * Recommended responsible department per category (U4 escalation). This is a
+ * recommendation label only — not a government integration.
+ */
+export const DEPARTMENT_BY_CATEGORY: Record<IssueCategory, string> = {
+  water_leak: "Water Supply Department",
+  drainage: "Drainage & Sewerage Department",
+  pothole: "Roads & Public Works Department",
+  streetlight: "Electricity / Street Lighting Department",
+  garbage: "Municipal Solid Waste Department",
+  other: "Municipal Corporation (General)",
+};
+
 /* -------------------------------------------------------------------------- */
 /*                            Aggregation engine                              */
 /* -------------------------------------------------------------------------- */
