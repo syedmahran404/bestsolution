@@ -9,13 +9,16 @@
  */
 import {
   CATEGORY_META,
+  CONTEXT_RADIUS_M,
   POPULATION_BASE,
   severityLabelFromScore,
 } from "@/lib/constants";
 import type {
   CivicCase,
   CivicReport,
+  CommunityImpact,
   ContextFactor,
+  HealthFactor,
   PriorityAssessment,
   Recommendation,
   TimelineEvent,
@@ -93,6 +96,28 @@ export function computePriority(
     Math.min(100, Math.round(severity + aggregationBoost + recencyBoost)),
   );
 
+  // Weighted input breakdown for the transparency panel (U4).
+  const inputs: HealthFactor[] = [
+    {
+      label: "Context-aware severity",
+      weight: 1,
+      value: severity,
+      contribution: severity,
+    },
+    {
+      label: "Aggregation size",
+      weight: 0.3,
+      value: civicCase.reportCount,
+      contribution: aggregationBoost,
+    },
+    {
+      label: "Recency (24h)",
+      weight: 0.1,
+      value: recencyBoost > 0 ? 1 : 0,
+      contribution: recencyBoost,
+    },
+  ];
+
   // Confidence rises with evidence (reports + context); capped.
   const confidence = Math.min(
     0.95,
@@ -106,9 +131,34 @@ export function computePriority(
     label: severityLabelFromScore(score),
     confidence: Number(confidence.toFixed(2)),
     reasons,
+    inputs,
     affectedPopulation: estimateAffectedPopulation(civicCase, factors),
     contextFactors: factors,
     reportCount: civicCase.reportCount,
+  };
+}
+
+/** Deterministic, explainable community-impact estimate for a single case. */
+export function computeCaseCommunityImpact(
+  civicCase: CivicCase,
+  reports: CivicReport[],
+): CommunityImpact {
+  const factors = aggregateFactors(reports);
+  const count = (t: string) => factors.filter((f) => f.type === t).length;
+  const reasons: string[] = [
+    `Estimated from category base, ${civicCase.reportCount} report(s), and ${factors.length} nearby place type(s).`,
+  ];
+  if (factors.length) {
+    reasons.push(`Nearby: ${factors.map((f) => f.type).join(", ")}.`);
+  }
+  return {
+    people: estimateAffectedPopulation(civicCase, factors),
+    schools: count("school"),
+    hospitals: count("hospital"),
+    transit: count("transit") + count("railway"),
+    businesses: count("market"),
+    radiusM: CONTEXT_RADIUS_M,
+    reasons,
   };
 }
 

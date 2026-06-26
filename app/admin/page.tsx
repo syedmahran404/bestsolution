@@ -4,6 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { OpsMetrics } from "@/components/admin/ops-metrics";
 import { OpsAnalytics } from "@/components/admin/ops-analytics";
+import { ExecutiveMetrics } from "@/components/admin/executive-metrics";
+import { HealthIndex } from "@/components/health/health-index";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_META } from "@/lib/constants";
 import { listCivicCases } from "@/lib/civic-cases";
 import { computeOperationsMetrics } from "@/lib/insights";
+import { computeCivicHealthOverview } from "@/lib/civic-health";
 import { computePriority } from "@/lib/operations";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicCase } from "@/types";
@@ -33,6 +36,10 @@ export default async function AdminPage() {
   }
 
   const metrics = computeOperationsMetrics(cases);
+  const healthOverview = computeCivicHealthOverview(cases);
+  const criticalCount = cases.filter(
+    (c) => c.severityLabel === "critical" || c.severityLabel === "high",
+  ).length;
 
   // U3: deterministic priority ranking for the operations queue.
   const ranked = cases
@@ -77,6 +84,15 @@ export default async function AdminPage() {
           </Card>
         ) : (
           <>
+            <HealthIndex overview={healthOverview} />
+
+            <ExecutiveMetrics
+              criticalCount={criticalCount}
+              resolutionRate={healthOverview.resolution.resolutionRate}
+              avgResolutionHours={healthOverview.resolution.avgResolutionHours}
+              dailyActive={metrics.dailyActiveCount}
+            />
+
             <OpsMetrics metrics={metrics} />
 
             {/* U3: highest-priority operations queue (deterministic ranking) */}
