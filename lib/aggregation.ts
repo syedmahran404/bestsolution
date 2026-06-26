@@ -193,6 +193,20 @@ export async function aggregateReport(
     if (keywords.length > 0) {
       caseUpdate.keywords = FieldValue.arrayUnion(...keywords);
     }
+    // U2: keep the case's representative severity as the max of its members,
+    // and fill locality/district from the first report that has them.
+    const reportSev = report.severityScore ?? 0;
+    if (reportSev > (match.data.severityScore ?? 0)) {
+      caseUpdate.severityScore = reportSev;
+      caseUpdate.severityLabel =
+        report.severityLabel ?? match.data.severityLabel ?? null;
+    }
+    if (!match.data.locality && report.locality) {
+      caseUpdate.locality = report.locality;
+    }
+    if (!match.data.district && report.district) {
+      caseUpdate.district = report.district;
+    }
     batch.update(casesCol.doc(match.id), caseUpdate);
     batch.update(reportRef, { civicCaseId: match.id });
     await batch.commit();
@@ -213,11 +227,18 @@ export async function aggregateReport(
     centerLocation: { lat: report.latitude, lng: report.longitude },
     reportCount: 1,
     status: "reported",
+    locality: report.locality ?? null,
+    district: report.district ?? null,
     reportIds: [report.id],
     keywords,
     createdAt: now,
     updatedAt: now,
   };
+  // Only attach severity when present (avoid undefined in Firestore set()).
+  if (typeof report.severityScore === "number") {
+    civicCase.severityScore = report.severityScore;
+    civicCase.severityLabel = report.severityLabel;
+  }
 
   const batch = db.batch();
   batch.set(caseRef, civicCase);

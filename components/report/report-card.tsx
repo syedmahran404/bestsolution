@@ -41,13 +41,19 @@ export function ReportCard({ report }: { report: CivicReport }) {
       <div className="min-w-0 flex-1 space-y-1.5">
         <div className="flex items-start justify-between gap-2">
           <h3 className="truncate font-semibold">{report.title}</h3>
-          <Badge
-            variant="outline"
-            className="shrink-0"
-            style={{ borderColor: status.hex, color: status.hex }}
-          >
-            {status.label}
-          </Badge>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {report.severityLabel && (
+              <Badge variant="secondary" className="capitalize">
+                {report.severityLabel}
+              </Badge>
+            )}
+            <Badge
+              variant="outline"
+              style={{ borderColor: status.hex, color: status.hex }}
+            >
+              {status.label}
+            </Badge>
+          </div>
         </div>
 
         <p className="line-clamp-2 text-sm text-muted-foreground">
@@ -60,7 +66,9 @@ export function ReportCard({ report }: { report: CivicReport }) {
           </span>
           <span className="inline-flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
-            {report.latitude.toFixed(4)}, {report.longitude.toFixed(4)}
+            {report.locality
+              ? report.locality
+              : `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}
           </span>
           {report.audioUrl && (
             <span className="inline-flex items-center gap-1">

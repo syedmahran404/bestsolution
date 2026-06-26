@@ -42,11 +42,15 @@ cases** and makes the whole pipeline transparent:
   reports are scoped to your device under **My Reports**.
 - **Visible AI reasoning** — category, confidence, reasoning, keywords, summary,
   and voice transcript shown for every report.
+- **Context-aware severity (U2)** — reverse-geocoded location + nearby places
+  (schools, hospitals, transit…) produce an explainable severity score with
+  human-readable reasons. Shown on a context card.
 - **Aggregation engine** — deterministic geospatial clustering into civic cases.
 - **AI case intelligence** — concise case summary + community-impact line.
 - **Operations Center** — KPI dashboard, most-reported categories, largest cases,
   active clusters, recent activity.
-- **Case management** — search & filters (category, status, report count, date).
+- **Case management** — search & filters (category, status, severity, locality,
+  report count, date).
 - **Status workflow** — Reported → Verified → In Progress → Resolved, with a
   status timeline; changes cascade to all member reports.
 
@@ -89,7 +93,9 @@ are cached by report count) to minimize token usage.
 
 - **Gemini 2.5 Flash** (via Google AI Studio) — multimodal classification,
   voice transcription, reasoning, and case summaries.
-- **Google Maps Platform** — the interactive India civic map.
+- **Google Maps Platform** — the interactive India civic map, plus the
+  **Geocoding API** (reverse-geocoded localities) and **Places API** (nearby
+  context for explainable severity) used by U2 Context Intelligence.
 - **Firebase** (Firestore + Storage) — data and media persistence.
 
 ## AI Workflow

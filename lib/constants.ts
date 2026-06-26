@@ -88,6 +88,82 @@ export const AGGREGATION_RADIUS_M = 150;
 export const SAME_SPOT_RADIUS_M = 35;
 
 /* -------------------------------------------------------------------------- */
+/*                    Context-aware severity model (U2)                       */
+/* -------------------------------------------------------------------------- */
+
+/** Radius (m) within which nearby places are considered for context severity. */
+export const CONTEXT_RADIUS_M = 250;
+
+/** Base severity per category (0-100 scale, before context boosts). */
+export const SEVERITY_BASE: Record<IssueCategory, number> = {
+  water_leak: 55,
+  drainage: 50,
+  pothole: 45,
+  streetlight: 35,
+  garbage: 35,
+  other: 30,
+};
+
+/**
+ * Context boost per nearby sensitive place type. Each contributes its weight
+ * when a matching place is within CONTEXT_RADIUS_M (closest match only).
+ * Maps Google Place types → our normalized context type + weight + label.
+ */
+export const CONTEXT_RULES: Array<{
+  type: string;
+  label: string;
+  weight: number;
+  googleTypes: string[];
+}> = [
+  {
+    type: "hospital",
+    label: "hospital",
+    weight: 25,
+    googleTypes: ["hospital", "doctor"],
+  },
+  {
+    type: "school",
+    label: "school",
+    weight: 22,
+    googleTypes: ["school", "primary_school", "secondary_school", "university"],
+  },
+  {
+    type: "transit",
+    label: "bus/transit stop",
+    weight: 12,
+    googleTypes: ["bus_station", "transit_station", "subway_station"],
+  },
+  {
+    type: "railway",
+    label: "railway station",
+    weight: 14,
+    googleTypes: ["train_station", "light_rail_station"],
+  },
+  {
+    type: "government",
+    label: "government building",
+    weight: 12,
+    googleTypes: ["city_hall", "local_government_office", "courthouse"],
+  },
+  {
+    type: "market",
+    label: "market",
+    weight: 10,
+    googleTypes: ["market", "supermarket", "shopping_mall"],
+  },
+];
+
+/** Severity band thresholds from the composite score. */
+export function severityLabelFromScore(
+  score: number,
+): "low" | "medium" | "high" | "critical" {
+  if (score >= 85) return "critical";
+  if (score >= 65) return "high";
+  if (score >= 45) return "medium";
+  return "low";
+}
+
+/* -------------------------------------------------------------------------- */
 /*                          Status workflow (Phase 5)                         */
 /* -------------------------------------------------------------------------- */
 

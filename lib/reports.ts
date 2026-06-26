@@ -12,6 +12,7 @@ import { COLLECTIONS } from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { aggregateReport, type AggregationResult } from "@/lib/aggregation";
 import { analyzeReport } from "@/lib/ai/analysis";
+import { buildReportContext } from "@/lib/context";
 import type { CreateReportInput } from "@/lib/validation/report";
 import type { AIAnalysis, CivicReport } from "@/types";
 
@@ -55,10 +56,31 @@ export async function submitReport(input: CreateReportInput): Promise<{
   aggregation: AggregationResult;
   analysis: AIAnalysis | null;
 }> {
+  const db = getAdminDb();
   const report = await createReport(input);
-  const aggregation = await aggregateReport(report);
+
+  // U2 — Context Intelligence: reverse-geocode + nearby places + explainable
+  // severity (one geocode + one places call). Cached on the report document.
+  const ctx = await buildReportContext(report);
+  const contextFields = {
+    formattedAddress: ctx.formattedAddress,
+    locality: ctx.locality,
+    district: ctx.district,
+    state: ctx.state,
+    contextFactors: ctx.factors,
+    severityScore: ctx.severityScore,
+    severityLabel: ctx.severityLabel,
+    severityReasons: ctx.severityReasons,
+    contextSource: ctx.source,
+  };
+  await db.collection(COLLECTIONS.reports).doc(report.id).update(contextFields);
+
+  const enriched: CivicReport = { ...report, ...contextFields };
+
+  // Phase 3 aggregation (now also propagates severity/locality to the case).
+  const aggregation = await aggregateReport(enriched);
   const linkedReport: CivicReport = {
-    ...report,
+    ...enriched,
     civicCaseId: aggregation.civicCaseId,
   };
 
