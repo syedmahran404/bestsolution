@@ -164,6 +164,23 @@ export function severityLabelFromScore(
 }
 
 /* -------------------------------------------------------------------------- */
+/*                    Operations priority model (U3)                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Rough base population affected per category, before aggregation/context
+ * multipliers. Used only for a clearly-labelled deterministic ESTIMATE.
+ */
+export const POPULATION_BASE: Record<IssueCategory, number> = {
+  water_leak: 2000,
+  drainage: 1500,
+  pothole: 800,
+  garbage: 600,
+  streetlight: 300,
+  other: 200,
+};
+
+/* -------------------------------------------------------------------------- */
 /*                          Status workflow (Phase 5)                         */
 /* -------------------------------------------------------------------------- */
 

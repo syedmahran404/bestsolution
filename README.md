@@ -54,6 +54,21 @@ cases** and makes the whole pipeline transparent:
 - **Status workflow** — Reported → Verified → In Progress → Resolved, with a
   status timeline; changes cascade to all member reports.
 
+## Operations Intelligence (U3)
+
+Velora behaves like a real civic operations center — explainable, never a black box:
+
+- **AI Operations Brief** per case (current issue, root cause, impact, why it
+  matters, next actions with reasons, dependencies, risks) — one cached Gemini
+  call per case, deterministic fallback when unconfigured.
+- **Explainable priority** (deterministic score + confidence + reasons +
+  affected-population estimate + nearby landmarks) and a **recommendation engine**
+  (inspect / verify / dispatch / coordinate / monitor / await / escalate / close)
+  that always shows its reasoning.
+- **Operations timeline** and an upgraded dashboard (highest-priority queue, most
+  affected localities/districts, recently escalated, fastest-growing cluster,
+  daily/weekly activity). All analytics are deterministic — no Gemini.
+
 ## Architecture
 
 ```

@@ -3,12 +3,15 @@ import { ArrowRight } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { OpsMetrics } from "@/components/admin/ops-metrics";
+import { OpsAnalytics } from "@/components/admin/ops-analytics";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORY_META } from "@/lib/constants";
 import { listCivicCases } from "@/lib/civic-cases";
 import { computeOperationsMetrics } from "@/lib/insights";
+import { computePriority } from "@/lib/operations";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicCase } from "@/types";
 
@@ -30,6 +33,12 @@ export default async function AdminPage() {
   }
 
   const metrics = computeOperationsMetrics(cases);
+
+  // U3: deterministic priority ranking for the operations queue.
+  const ranked = cases
+    .map((c) => ({ c, p: computePriority(c) }))
+    .sort((a, b) => b.p.score - a.p.score)
+    .slice(0, 5);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -69,6 +78,34 @@ export default async function AdminPage() {
         ) : (
           <>
             <OpsMetrics metrics={metrics} />
+
+            {/* U3: highest-priority operations queue (deterministic ranking) */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">
+                  Highest priority cases
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {ranked.length === 0 ? (
+                  <EmptyHint />
+                ) : (
+                  ranked.map(({ c, p }) => (
+                    <div key={c.id} className="flex items-center gap-3">
+                      <Badge
+                        variant="secondary"
+                        className="shrink-0 capitalize"
+                      >
+                        {p.label} · {p.score}
+                      </Badge>
+                      <div className="min-w-0 flex-1">
+                        <CivicCaseCard civicCase={c} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Largest civic cases */}
@@ -152,6 +189,9 @@ export default async function AdminPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* U3: deterministic operational analytics */}
+            <OpsAnalytics metrics={metrics} />
           </>
         )}
       </main>
