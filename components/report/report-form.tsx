@@ -100,14 +100,16 @@ export function ReportForm() {
         }),
       });
 
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        aggregation?: { reportCount?: number };
+      };
       if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as {
-          error?: string;
-        };
         throw new Error(data.error ?? "Failed to submit report.");
       }
 
-      router.push("/reports?submitted=1");
+      const count = data.aggregation?.reportCount ?? 1;
+      router.push(`/reports?submitted=1&count=${count}`);
       router.refresh();
     } catch (err) {
       setSubmitError(
