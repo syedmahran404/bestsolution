@@ -52,7 +52,9 @@ export function OperationsTimeline({ events }: { events: TimelineEvent[] }) {
             <div className="pb-1">
               <p className="text-sm font-medium">{e.label}</p>
               <p className="text-xs text-muted-foreground">{fmt(e.at)}</p>
-              {e.detail && <p className="text-xs text-slate-600">{e.detail}</p>}
+              {e.detail && (
+                <p className="text-xs text-muted-foreground">{e.detail}</p>
+              )}
             </div>
           </li>
         );

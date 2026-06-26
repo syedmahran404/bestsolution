@@ -20,8 +20,15 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Applied before paint to avoid a theme flash. Follows the user's saved
+  // choice, otherwise the OS preference (dark-mode first for dark-OS users).
+  const themeInit = `(function(){try{var t=localStorage.getItem('velora.theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",

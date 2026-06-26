@@ -91,7 +91,7 @@ export function PriorityPanel({
           <p className="text-xs font-medium text-muted-foreground">
             Why this priority
           </p>
-          <ul className="space-y-0.5 text-xs text-slate-600">
+          <ul className="space-y-0.5 text-xs text-muted-foreground">
             {priority.reasons.map((r, i) => (
               <li key={i}>• {r}</li>
             ))}
@@ -103,7 +103,7 @@ export function PriorityPanel({
             Recommended action
           </p>
           <p className="font-medium">{recommendation.label}</p>
-          <ul className="mt-1 space-y-0.5 text-xs text-slate-600">
+          <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
             {recommendation.reasoning.map((r, i) => (
               <li key={i}>• {r}</li>
             ))}
