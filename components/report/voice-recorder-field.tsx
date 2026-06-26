@@ -88,6 +88,12 @@ export function VoiceRecorderField({ onAudioChange }: VoiceRecorderFieldProps) {
           </Button>
         </div>
       )}
+
+      <p className="text-xs text-muted-foreground">
+        {previewUrl
+          ? "Voice note attached. We'll transcribe it when the format is supported; otherwise your text is still analyzed — your report is never dropped."
+          : "Speak in any language. If your browser records an unsupported format, the report still works from your text and photo."}
+      </p>
     </div>
   );
 }

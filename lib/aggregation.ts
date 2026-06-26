@@ -16,7 +16,11 @@ import "server-only";
 import { FieldValue } from "firebase-admin/firestore";
 import { getDistance } from "geolib";
 
-import { AGGREGATION_RADIUS_M, COLLECTIONS } from "@/lib/constants";
+import {
+  AGGREGATION_RADIUS_M,
+  COLLECTIONS,
+  SAME_SPOT_RADIUS_M,
+} from "@/lib/constants";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { CivicCase, CivicReport } from "@/types";
 
@@ -41,12 +45,87 @@ export function distanceMeters(
   );
 }
 
+// Common words ignored when extracting signal keywords for the merge guard.
+const STOPWORDS = new Set([
+  "the",
+  "and",
+  "for",
+  "with",
+  "near",
+  "from",
+  "this",
+  "that",
+  "there",
+  "here",
+  "have",
+  "has",
+  "are",
+  "was",
+  "were",
+  "been",
+  "being",
+  "into",
+  "out",
+  "off",
+  "on",
+  "in",
+  "at",
+  "to",
+  "of",
+  "a",
+  "an",
+  "is",
+  "it",
+  "its",
+  "by",
+  "be",
+  "or",
+  "as",
+  "we",
+  "our",
+  "my",
+  "me",
+  "you",
+  "your",
+  "issue",
+  "problem",
+  "please",
+  "report",
+  "reported",
+  "area",
+  "road",
+  "street",
+]);
+
+/** Deterministic signal keywords from a report's title + description (U1). */
+export function extractKeywords(report: CivicReport): string[] {
+  const text = `${report.title} ${report.description}`.toLowerCase();
+  const tokens = text.split(/[^a-z0-9]+/).filter(Boolean);
+  const out: string[] = [];
+  for (const t of tokens) {
+    if (t.length < 3 || STOPWORDS.has(t)) continue;
+    if (!out.includes(t)) out.push(t);
+    if (out.length >= 12) break;
+  }
+  return out;
+}
+
+function hasOverlap(a: string[], b: string[] | undefined): boolean {
+  if (!b || b.length === 0) return false;
+  const setB = new Set(b);
+  return a.some((t) => setB.has(t));
+}
+
 /**
- * Find the nearest existing civic case (same category) within the clustering
- * radius. Returns null when no case qualifies (→ a new case should be created).
+ * Find the nearest existing civic case (same category) that this report should
+ * merge into. Within the tight same-spot radius we always merge; between the
+ * tight and full radius we require keyword overlap so distinct nearby issues
+ * stay separate. Legacy cases without keywords fall back to geo-only matching
+ * (preserves pre-U1 behavior). Returns null when no case qualifies.
  */
 async function findNearestCase(
   report: CivicReport,
+  keywords: string[],
 ): Promise<{ id: string; data: CivicCase; distance: number } | null> {
   const db = getAdminDb();
   const snap = await db
@@ -60,7 +139,16 @@ async function findNearestCase(
   for (const doc of snap.docs) {
     const data = doc.data() as CivicCase;
     const d = distanceMeters(point, data.centerLocation);
-    if (d <= AGGREGATION_RADIUS_M && (best === null || d < best.distance)) {
+    if (d > AGGREGATION_RADIUS_M) continue;
+
+    // Distinct-issue guard: beyond the same-spot radius, require either keyword
+    // overlap, or a legacy case with no keywords recorded.
+    const sameSpot = d <= SAME_SPOT_RADIUS_M;
+    const legacy = !data.keywords || data.keywords.length === 0;
+    const eligible = sameSpot || legacy || hasOverlap(keywords, data.keywords);
+    if (!eligible) continue;
+
+    if (best === null || d < best.distance) {
       best = { id: doc.id, data, distance: d };
     }
   }
@@ -79,7 +167,8 @@ export async function aggregateReport(
   const reportRef = db.collection(COLLECTIONS.reports).doc(report.id);
   const casesCol = db.collection(COLLECTIONS.civicCases);
 
-  const match = await findNearestCase(report);
+  const keywords = extractKeywords(report);
+  const match = await findNearestCase(report, keywords);
 
   // ---- Attach to existing case ------------------------------------------
   if (match) {
@@ -95,12 +184,16 @@ export async function aggregateReport(
     };
 
     const batch = db.batch();
-    batch.update(casesCol.doc(match.id), {
+    const caseUpdate: Record<string, unknown> = {
       reportIds: FieldValue.arrayUnion(report.id),
       reportCount: newCount,
       centerLocation: newCenter,
       updatedAt: now,
-    });
+    };
+    if (keywords.length > 0) {
+      caseUpdate.keywords = FieldValue.arrayUnion(...keywords);
+    }
+    batch.update(casesCol.doc(match.id), caseUpdate);
     batch.update(reportRef, { civicCaseId: match.id });
     await batch.commit();
 
@@ -121,6 +214,7 @@ export async function aggregateReport(
     reportCount: 1,
     status: "reported",
     reportIds: [report.id],
+    keywords,
     createdAt: now,
     updatedAt: now,
   };

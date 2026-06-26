@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { AlertCircle, Loader2, Send } from "lucide-react";
+import { AlertCircle, Loader2, Send, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,11 @@ import { CATEGORY_META } from "@/lib/constants";
 import { isFirebaseClientConfigured } from "@/lib/firebase/client";
 import { guessExtension, uploadToStorage } from "@/lib/firebase/upload";
 import {
+  getReporterId,
+  getReporterName,
+  setReporterName,
+} from "@/lib/reporter";
+import {
   REPORT_CATEGORIES,
   reportFormSchema,
   type ReportFormValues,
@@ -27,6 +32,17 @@ export function ReportForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [identified, setIdentified] = useState(false);
+  const [name, setName] = useState("");
+
+  // Load any saved display name (client-only; localStorage).
+  useEffect(() => {
+    const saved = getReporterName();
+    if (saved) {
+      setName(saved);
+      setIdentified(true);
+    }
+  }, []);
 
   const {
     register,
@@ -69,10 +85,19 @@ export function ReportForm() {
         );
       }
 
+      const trimmedName = identified ? name.trim() : "";
+      setReporterName(trimmedName);
+
       const res = await fetch("/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, imageUrl, audioUrl }),
+        body: JSON.stringify({
+          ...values,
+          imageUrl,
+          audioUrl,
+          reporterId: getReporterId(),
+          reporterName: trimmedName || null,
+        }),
       });
 
       if (!res.ok) {
@@ -103,6 +128,44 @@ export function ReportForm() {
           </p>
         </div>
       )}
+
+      {/* Reporter identity (U1): anonymous by default, optional name */}
+      <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+        <div className="flex items-center gap-1.5">
+          <UserRound className="h-4 w-4 text-muted-foreground" />
+          <Label>Reporting as</Label>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={identified ? "outline" : "default"}
+            onClick={() => setIdentified(false)}
+          >
+            Anonymous
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={identified ? "default" : "outline"}
+            onClick={() => setIdentified(true)}
+          >
+            Add my name
+          </Button>
+        </div>
+        {identified && (
+          <Input
+            placeholder="Your name (optional)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+          />
+        )}
+        <p className="text-xs text-muted-foreground">
+          Anonymous reports never collect personal data. Either way, you can
+          track your reports on this device.
+        </p>
+      </div>
 
       {/* Title */}
       <div className="space-y-1.5">

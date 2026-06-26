@@ -42,6 +42,10 @@ export const createReportSchema = z.object({
     .max(180, "Invalid longitude"),
   imageUrl: z.string().url("Invalid image URL").nullable().optional(),
   audioUrl: z.string().url("Invalid audio URL").nullable().optional(),
+  /** Anonymous reporter id (U1). Optional for backward compatibility. */
+  reporterId: z.string().trim().min(1).max(64).nullable().optional(),
+  /** Optional display name for identified reporting (U1). */
+  reporterName: z.string().trim().max(80).nullable().optional(),
 });
 
 /** Server-side input (after media has been uploaded to Storage). */

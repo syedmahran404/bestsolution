@@ -79,6 +79,14 @@ export const GEMINI_MODEL = "gemini-2.5-flash";
  */
 export const AGGREGATION_RADIUS_M = 150;
 
+/**
+ * Reports within this very tight radius are treated as the same physical spot
+ * and aggregated regardless of wording (U1 false-merge guard). Beyond this (but
+ * within AGGREGATION_RADIUS_M) we additionally require keyword overlap so two
+ * *different* nearby same-category issues do not merge.
+ */
+export const SAME_SPOT_RADIUS_M = 35;
+
 /* -------------------------------------------------------------------------- */
 /*                          Status workflow (Phase 5)                         */
 /* -------------------------------------------------------------------------- */

@@ -38,6 +38,8 @@ cases** and makes the whole pipeline transparent:
   pins; red/amber/green status colors.
 - **Citizen reporting** — title, description, category, **photo upload**,
   **voice recording/upload**, one-tap **geolocation** (manual fallback).
+  Anonymous by default (no PII); optional named/"identified" reporting. Your
+  reports are scoped to your device under **My Reports**.
 - **Visible AI reasoning** — category, confidence, reasoning, keywords, summary,
   and voice transcript shown for every report.
 - **Aggregation engine** — deterministic geospatial clustering into civic cases.
