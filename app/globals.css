@@ -68,11 +68,26 @@
 }
 
 @layer utilities {
-  /* Premium UI helpers (U4) — used sparingly for signature surfaces. */
+  /* Premium UI helpers (U4/U5) — used consistently across surfaces. */
   .glass {
     @apply border border-white/40 bg-white/60 backdrop-blur-md;
   }
   .text-gradient-brand {
     @apply bg-gradient-to-r from-violet-600 to-sky-500 bg-clip-text text-transparent;
+  }
+  /* Subtle lift + shadow on interactive cards. */
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+  /* Signature hero surface gradient. */
+  .hero-surface {
+    @apply bg-gradient-to-br from-violet-600/10 via-sky-500/5 to-transparent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up,
+    .card-hover {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 }

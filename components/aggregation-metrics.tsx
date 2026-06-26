@@ -1,6 +1,7 @@
 import { FileText, Layers, TrendingUp } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 interface AggregationMetricsProps {
   totalReports: number;
@@ -8,7 +9,7 @@ interface AggregationMetricsProps {
   avgReportsPerCase: number;
 }
 
-/** Phase 3 aggregation metric cards (simple, read-only). */
+/** Phase 3 aggregation metric cards with animated counters (U5). */
 export function AggregationMetrics({
   totalReports,
   totalCases,
@@ -38,14 +39,19 @@ export function AggregationMetrics({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {cards.map((c) => (
-        <Card key={c.label} className="p-4">
+        <Card key={c.label} className="card-hover p-4">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-muted-foreground">
               {c.label}
             </p>
             <c.icon className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{c.value}</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums">
+            <AnimatedCounter
+              value={c.value}
+              decimals={Number.isInteger(c.value) ? 0 : 1}
+            />
+          </p>
           <p className="text-xs text-muted-foreground">{c.hint}</p>
         </Card>
       ))}

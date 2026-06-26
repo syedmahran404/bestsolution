@@ -13,9 +13,11 @@ import type { CivicMapMarker } from "@/types";
 import { MapLegend } from "@/components/map/map-legend";
 
 /** Colored teardrop pin (single report) as an inline SVG data-URI. */
-function pinIcon(hex: string): string {
+function pinIcon(hex: string, scale = 1): string {
+  const w = Math.round(28 * scale);
+  const h = Math.round(40 * scale);
   const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 28 40">
   <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 26 14 26s14-16.5 14-26C28 6.27 21.73 0 14 0z" fill="${hex}"/>
   <circle cx="14" cy="14" r="5.5" fill="#ffffff"/>
 </svg>`.trim();
@@ -23,10 +25,11 @@ function pinIcon(hex: string): string {
 }
 
 /** Aggregated civic-case bubble with the report count drawn inside the SVG. */
-function bubbleIcon(hex: string, count: number): string {
+function bubbleIcon(hex: string, count: number, scale = 1): string {
   const label = count > 99 ? "99+" : String(count);
+  const s = Math.round(44 * scale);
   const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 44 44">
   <circle cx="22" cy="22" r="20" fill="${hex}" stroke="#ffffff" stroke-width="3"/>
   <text x="22" y="27" text-anchor="middle" font-family="Arial, sans-serif"
     font-size="16" font-weight="700" fill="#ffffff">${label}</text>
@@ -87,15 +90,18 @@ export function CivicMap({ markers }: CivicMapProps) {
           {markers.map((marker) => {
             const hex = STATUS_META[marker.status].hex;
             const aggregated = marker.reportCount > 1;
+            const isSelected = marker.id === selectedId;
+            const scale = isSelected ? 1.35 : 1;
             return (
               <Marker
                 key={marker.id}
                 position={{ lat: marker.lat, lng: marker.lng }}
                 title={marker.title}
+                zIndex={isSelected ? 999 : undefined}
                 icon={
                   aggregated
-                    ? bubbleIcon(hex, marker.reportCount)
-                    : pinIcon(hex)
+                    ? bubbleIcon(hex, marker.reportCount, scale)
+                    : pinIcon(hex, scale)
                 }
                 onClick={() => setSelectedId(marker.id)}
               />
