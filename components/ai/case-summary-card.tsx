@@ -1,6 +1,7 @@
 import { Sparkles, Users } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrustBadges } from "@/components/trust/trust-badges";
 
 interface CaseSummaryCardProps {
   summary: string;
@@ -12,10 +13,13 @@ export function CaseSummaryCard({ summary, impact }: CaseSummaryCardProps) {
   return (
     <Card className="border-violet-200 bg-violet-50/50">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-1.5 text-base text-violet-900">
-          <Sparkles className="h-4 w-4" />
-          AI Case Summary
-        </CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-1.5 text-base text-violet-900">
+            <Sparkles className="h-4 w-4" />
+            AI Case Summary
+          </CardTitle>
+          <TrustBadges mode="ai" cached sources={["case", "context"]} />
+        </div>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         <p className="text-slate-800">{summary}</p>

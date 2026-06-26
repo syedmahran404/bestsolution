@@ -102,12 +102,70 @@ export interface PriorityAssessment {
   confidence: number;
   /** Human-readable reasons for the score. */
   reasons: string[];
+  /** Weighted input breakdown for the transparency panel (U4). */
+  inputs: HealthFactor[];
   /** Rough deterministic estimate of affected people. */
   affectedPopulation: number;
   /** Nearby impactful places considered. */
   contextFactors: ContextFactor[];
   /** Aggregation size. */
   reportCount: number;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                  Civic Health & Trust Intelligence (U4)                    */
+/* -------------------------------------------------------------------------- */
+
+/** A single weighted, explainable factor in a deterministic computation. */
+export interface HealthFactor {
+  label: string;
+  /** Relative weight of this factor. */
+  weight: number;
+  /** The measured input value (0-1 or absolute, see label). */
+  value: number;
+  /** Signed contribution to the final score. */
+  contribution: number;
+  note?: string;
+}
+
+export type TrendDirection = "rising" | "improving" | "stable" | "critical";
+
+/** A deterministic civic health score for a scope (city / district / ward / category). */
+export interface HealthScore {
+  scope: "city" | "district" | "ward" | "category";
+  name: string;
+  /** 0-100, higher = healthier. */
+  score: number;
+  trend: TrendDirection;
+  trendReason: string;
+  factors: HealthFactor[];
+  /** 0-1 confidence (rises with sample size). */
+  confidence: number;
+  sampleSize: number;
+}
+
+/** A deterministic, explainable community-impact estimate. */
+export interface CommunityImpact {
+  people: number;
+  schools: number;
+  hospitals: number;
+  transit: number;
+  businesses: number;
+  radiusM: number;
+  reasons: string[];
+}
+
+/** A deterministic, explainable civic insight card (U4). */
+export interface CivicInsight {
+  id: string;
+  title: string;
+  /** Why it matters. */
+  why: string;
+  /** How it was calculated (deterministic provenance). */
+  how: string;
+  /** 0-1 confidence. */
+  confidence: number;
+  kind: "trend" | "hotspot" | "priority" | "resolution";
 }
 
 /** A chronological operational event for the case timeline. */

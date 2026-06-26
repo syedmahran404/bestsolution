@@ -66,3 +66,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Premium UI helpers (U4) — used sparingly for signature surfaces. */
+  .glass {
+    @apply border border-white/40 bg-white/60 backdrop-blur-md;
+  }
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-violet-600 to-sky-500 bg-clip-text text-transparent;
+  }
+}

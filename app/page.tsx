@@ -1,11 +1,13 @@
 import { SiteHeader } from "@/components/site-header";
 import { CivicMap } from "@/components/map/civic-map";
 import { AggregationMetrics } from "@/components/aggregation-metrics";
-import { AIInsights } from "@/components/ai/ai-insights";
+import { HealthIndex } from "@/components/health/health-index";
+import { InsightCard } from "@/components/civic/insight-card";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { CATEGORY_META } from "@/lib/constants";
 import { computeAggregationMetrics } from "@/lib/aggregation";
-import { computeCivicInsights } from "@/lib/insights";
+import { computeCivicHealthOverview } from "@/lib/civic-health";
+import { generateCivicInsights } from "@/lib/civic-insights";
 import { listCivicCases } from "@/lib/civic-cases";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { SEED_ISSUES } from "@/lib/seed-data";
@@ -64,6 +66,11 @@ export default async function HomePage() {
         avgReportsPerCase: 1,
       };
 
+  const healthOverview = usingLiveData
+    ? computeCivicHealthOverview(cases)
+    : null;
+  const insights = usingLiveData ? generateCivicInsights(cases) : [];
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -71,7 +78,8 @@ export default async function HomePage() {
       <main className="container flex flex-1 flex-col gap-5 py-6">
         <section className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            India Civic Operations Center
+            India <span className="text-gradient-brand">Civic Operations</span>{" "}
+            Center
           </h1>
           <p className="text-sm text-muted-foreground">
             Citizen reports are automatically aggregated into civic cases.
@@ -80,14 +88,20 @@ export default async function HomePage() {
           </p>
         </section>
 
+        {healthOverview && <HealthIndex overview={healthOverview} />}
+
         <AggregationMetrics {...metrics} />
 
-        {usingLiveData && (
+        {usingLiveData && insights.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-lg font-semibold tracking-tight">
-              AI insights
+              Explainable civic insights
             </h2>
-            <AIInsights insights={computeCivicInsights(cases)} />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {insights.map((ins) => (
+                <InsightCard key={ins.id} insight={ins} />
+              ))}
+            </div>
           </section>
         )}
 

@@ -54,6 +54,24 @@ cases** and makes the whole pipeline transparent:
 - **Status workflow** — Reported → Verified → In Progress → Resolved, with a
   status timeline; changes cascade to all member reports.
 
+## Civic Health & Trust (U4)
+
+The signature differentiator — Velora feels like a civic operating system:
+
+- **Civic Health Index**: a living, deterministic 0-100 score for the city, with
+  per-category and per-ward breakdowns, color-coded **trend** (rising / improving
+  / stable / critical), and a fully explainable factor list. No Gemini.
+- **Explainable civic insights**: deterministic cards (e.g. "Water leak reports
+  increased 32% this week") each showing **why** and **how** it was calculated.
+- **Community impact** (per case): people/schools/hospitals/transit/businesses
+  nearby + impact radius, estimated deterministically from the context engine.
+- **Trust indicators** on every intelligence surface: deterministic vs AI-assisted,
+  cached, confidence, and data sources.
+- **Decision transparency panel**: the exact inputs, weights, and contributions
+  behind each priority + recommendation — judge-facing, no black box.
+- **Executive dashboard**: health, critical load, resolution rate, average
+  resolution time, activity — all deterministic.
+
 ## Operations Intelligence (U3)
 
 Velora behaves like a real civic operations center — explainable, never a black box:

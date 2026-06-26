@@ -10,6 +10,7 @@ import { CaseSummaryCard } from "@/components/ai/case-summary-card";
 import { ContextCard } from "@/components/context/context-card";
 import { OperationsBriefPanel } from "@/components/operations/operations-brief-panel";
 import { PriorityPanel } from "@/components/operations/priority-panel";
+import { TransparencyPanel } from "@/components/operations/transparency-panel";
 import { OperationsTimeline } from "@/components/operations/operations-timeline";
 import { StatusManager } from "@/components/cases/status-manager";
 import { Badge } from "@/components/ui/badge";
@@ -24,11 +25,19 @@ import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
 import { getOrGenerateOperationsBrief } from "@/lib/ai/operations-brief";
 import {
   buildOperationsTimeline,
+  computeCaseCommunityImpact,
   computePriority,
   recommendAction,
 } from "@/lib/operations";
 import { explainLinkage } from "@/lib/insights";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
+import {
+  Users,
+  Building2,
+  School,
+  Bus,
+  MapPin as MapPinIcon,
+} from "lucide-react";
 import type { CivicMapMarker, ContextFactor } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -73,6 +82,7 @@ export default async function CaseDetailPage({
     recommendation,
   );
   const timeline = buildOperationsTimeline(civicCase, reports);
+  const impact = computeCaseCommunityImpact(civicCase, reports);
 
   const markers: CivicMapMarker[] = reports.map((r) => ({
     id: r.id,
@@ -195,6 +205,60 @@ export default async function CaseDetailPage({
         {/* U3: explainable prioritization + recommendation */}
         <PriorityPanel priority={priority} recommendation={recommendation} />
 
+        {/* U4: decision transparency + community impact */}
+        <TransparencyPanel
+          priority={priority}
+          recommendation={recommendation}
+        />
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              <Users className="h-4 w-4" />
+              Community impact (estimate)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <ImpactStat
+                icon={Users}
+                label="People affected"
+                value={`~${impact.people.toLocaleString()}`}
+              />
+              <ImpactStat
+                icon={School}
+                label="Schools nearby"
+                value={String(impact.schools)}
+              />
+              <ImpactStat
+                icon={Building2}
+                label="Hospitals nearby"
+                value={String(impact.hospitals)}
+              />
+              <ImpactStat
+                icon={Bus}
+                label="Transit nearby"
+                value={String(impact.transit)}
+              />
+              <ImpactStat
+                icon={Building2}
+                label="Businesses nearby"
+                value={String(impact.businesses)}
+              />
+              <ImpactStat
+                icon={MapPinIcon}
+                label="Impact radius"
+                value={`${impact.radiusM} m`}
+              />
+            </div>
+            <ul className="space-y-0.5 text-xs text-muted-foreground">
+              {impact.reasons.map((r, i) => (
+                <li key={i}>• {r}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
         {/* Operations: status workflow + timeline + aggregation info */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
@@ -288,6 +352,26 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="font-medium">{value}</p>
+    </div>
+  );
+}
+
+function ImpactStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Users;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 rounded-md border p-2">
+      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <div className="min-w-0">
+        <p className="truncate text-xs text-muted-foreground">{label}</p>
+        <p className="font-semibold tabular-nums">{value}</p>
+      </div>
     </div>
   );
 }
