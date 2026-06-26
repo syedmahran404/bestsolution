@@ -62,6 +62,11 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        soft: "0 1px 2px hsl(222 47% 11% / 0.04), 0 6px 20px -6px hsl(222 47% 11% / 0.08)",
+        elevated:
+          "0 2px 6px hsl(222 47% 11% / 0.06), 0 16px 40px -12px hsl(222 47% 11% / 0.16)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -79,6 +84,14 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "none" },
         },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.97)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -86,6 +99,8 @@ const config: Config = {
         "pulse-ring":
           "pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite",
         "fade-in-up": "fade-in-up 0.4s ease-out both",
+        "scale-in": "scale-in 0.2s ease-out both",
+        shimmer: "shimmer 1.6s linear infinite",
       },
     },
   },

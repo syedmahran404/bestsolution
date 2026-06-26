@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Activity } from "lucide-react";
 
 import { NavLinks } from "@/components/nav-links";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
  * Top navigation bar for the Civic Operations Center.
@@ -28,7 +29,11 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <NavLinks />
+        <div className="flex items-center gap-1">
+          <NavLinks />
+          <span className="mx-1 hidden h-5 w-px bg-border sm:block" />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

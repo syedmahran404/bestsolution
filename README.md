@@ -54,6 +54,21 @@ cases** and makes the whole pipeline transparent:
 - **Status workflow** — Reported → Verified → In Progress → Resolved, with a
   status timeline; changes cascade to all member reports.
 
+## Premium Design System (U5.1)
+
+A distinctive, token-driven visual identity (presentation only — no logic changes):
+
+- **Refined design tokens**: premium light palette (deep ink, cool near-white,
+  signature violet focus ring) + a polished dark palette; softer radii.
+- **Ambient identity**: subtle environmental glow, layered `shadow-soft` /
+  `shadow-elevated` tokens applied through the base `Card` primitive.
+- **Primitive physics**: button press (active scale), shimmer skeletons,
+  scale-in / fade-in motion tokens — all respecting `prefers-reduced-motion`.
+- **Theme toggle**: light/dark switch in the header; initial theme follows OS
+  preference (dark-first for dark-OS users) and persists, with no flash.
+- Cohesion comes from the token + primitive layer, so every screen inherits the
+  identity consistently.
+
 ## Premium Experience (U5)
 
 A polished, enterprise-grade product layer (presentation only — no logic changes):
