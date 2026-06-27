@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ThinkingDots } from "@/components/motion/thinking-dots";
 
 interface AgentStep {
   tool: string;
@@ -111,6 +112,21 @@ export function OpsAgent() {
         </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
+
+        {/* AI thinking choreography (MO3) */}
+        {loading && (
+          <div className="animate-fade-in space-y-2 rounded-md border border-brand/20 bg-brand/5 p-3">
+            <p className="flex items-center gap-2 text-sm font-medium text-brand">
+              <Sparkles className="h-4 w-4 animate-pulse" />
+              Velora is analyzing
+              <ThinkingDots />
+            </p>
+            <div className="space-y-1.5">
+              <div className="shimmer h-2.5 w-3/4 animate-shimmer rounded" />
+              <div className="shimmer h-2.5 w-1/2 animate-shimmer rounded" />
+            </div>
+          </div>
+        )}
 
         {result && (
           <div className="space-y-3 animate-fade-in-up">

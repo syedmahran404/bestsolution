@@ -11,6 +11,7 @@ import {
 
 import "./globals.css";
 import { LanguagePicker } from "@/components/i18n/language-picker";
+import { PageTransition } from "@/components/motion/page-transition";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { getInitialLocale } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
@@ -95,7 +96,7 @@ export default function RootLayout({
         )}
       >
         <I18nProvider initialLocale={locale}>
-          {children}
+          <PageTransition>{children}</PageTransition>
           <LanguagePicker />
         </I18nProvider>
       </body>

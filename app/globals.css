@@ -334,3 +334,17 @@
     }
   }
 }
+
+/* Celebration confetti (Phase 2C, MO4/EM1). Pure CSS; gated by reduced-motion
+   in the component (particles are not rendered when the user prefers reduced
+   motion, and the global guard neutralizes any residual animation). */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-12vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(112vh) rotate(720deg);
+    opacity: 0.9;
+  }
+}

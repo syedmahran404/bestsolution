@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Celebration } from "@/components/motion/celebration";
 import { STATUS_META, WORKFLOW_STATUSES } from "@/lib/constants";
 import type { IssueStatus } from "@/types";
 
@@ -22,6 +23,7 @@ export function StatusManager({ caseId, currentStatus }: StatusManagerProps) {
   const router = useRouter();
   const [pending, setPending] = useState<IssueStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
 
   async function setStatus(status: IssueStatus) {
     if (status === currentStatus || pending) return;
@@ -37,6 +39,8 @@ export function StatusManager({ caseId, currentStatus }: StatusManagerProps) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error ?? "Failed to update status.");
       }
+      // Emotional payoff (EM1): celebrate when a case is resolved.
+      if (status === "resolved") setCelebrate(true);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update status.");
@@ -47,6 +51,11 @@ export function StatusManager({ caseId, currentStatus }: StatusManagerProps) {
 
   return (
     <div className="space-y-2">
+      <Celebration
+        active={celebrate}
+        message="Case resolved!"
+        onDone={() => setCelebrate(false)}
+      />
       <p className="text-xs font-medium text-muted-foreground">Update status</p>
       <div className="flex flex-wrap gap-2">
         {WORKFLOW_STATUSES.map((s) => {

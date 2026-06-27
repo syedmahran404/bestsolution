@@ -8,6 +8,7 @@ import { InsightCard } from "@/components/civic/insight-card";
 import { CategoryDistribution } from "@/components/civic/category-distribution";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { SectionHeader } from "@/components/brand";
+import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_META } from "@/lib/constants";
@@ -122,7 +123,10 @@ export default async function HomePage() {
 
         {/* Insights + distribution */}
         {usingLiveData && (insights.length > 0 || cases.length > 0) && (
-          <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Reveal
+            as="section"
+            className="grid grid-cols-1 gap-4 lg:grid-cols-3"
+          >
             <div className="space-y-3 lg:col-span-2">
               <SectionHeader title="Explainable civic insights" />
               {insights.length > 0 ? (
@@ -141,12 +145,12 @@ export default async function HomePage() {
               <SectionHeader title="Distribution" />
               <CategoryDistribution cases={cases} />
             </div>
-          </section>
+          </Reveal>
         )}
 
         {/* Civic cases */}
         {usingLiveData && (
-          <section className="space-y-3">
+          <Reveal as="section" className="space-y-3">
             <SectionHeader title="Civic cases" />
             <div className="space-y-3">
               {cases.slice(0, 10).map((c) => (
@@ -155,7 +159,7 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-          </section>
+          </Reveal>
         )}
       </main>
 
