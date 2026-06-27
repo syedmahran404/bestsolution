@@ -1,19 +1,29 @@
 import { STATUS_GROUP_META } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
+const GROUP_DOT: Record<string, string> = {
+  open: "bg-status-open",
+  progress: "bg-status-progress",
+  resolved: "bg-status-resolved",
+};
 
 /**
  * Compact status legend rendered as an overlay on the map (and inside the
- * no-key placeholder). Mirrors the red / amber / green marker palette.
+ * no-key placeholder). Mirrors the red / amber / green marker palette via
+ * theme-aware status tokens.
  */
 export function MapLegend() {
-  const groups = Object.values(STATUS_GROUP_META);
+  const groups = Object.entries(STATUS_GROUP_META);
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-background/90 px-3 py-2 text-xs shadow-sm backdrop-blur">
-      {groups.map((g) => (
-        <div key={g.label} className="flex items-center gap-1.5">
+    <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/90 px-3 py-2 text-xs shadow-elev-1 backdrop-blur">
+      {groups.map(([key, g]) => (
+        <div key={key} className="flex items-center gap-1.5">
           <span
-            className="inline-block h-2.5 w-2.5 rounded-full"
-            style={{ backgroundColor: g.hex }}
+            className={cn(
+              "inline-block h-2.5 w-2.5 rounded-full",
+              GROUP_DOT[key] ?? "bg-muted-foreground",
+            )}
           />
           <span className="font-medium text-foreground">{g.label}</span>
         </div>

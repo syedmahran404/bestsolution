@@ -1,6 +1,6 @@
-import { FileText, Layers, TrendingUp } from "lucide-react";
+import { FileText, Layers, TrendingUp, type LucideIcon } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
+import { MetricCard } from "@/components/brand";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 interface AggregationMetricsProps {
@@ -9,51 +9,60 @@ interface AggregationMetricsProps {
   avgReportsPerCase: number;
 }
 
+type Accent = "brand" | "info" | "success";
+
 /** Phase 3 aggregation metric cards with animated counters (U5). */
 export function AggregationMetrics({
   totalReports,
   totalCases,
   avgReportsPerCase,
 }: AggregationMetricsProps) {
-  const cards = [
+  const cards: {
+    label: string;
+    value: number;
+    icon: LucideIcon;
+    hint: string;
+    accent: Accent;
+  }[] = [
     {
       label: "Total Reports",
       value: totalReports,
       icon: FileText,
       hint: "Citizen submissions",
+      accent: "brand",
     },
     {
       label: "Civic Cases",
       value: totalCases,
       icon: Layers,
       hint: "Aggregated from reports",
+      accent: "info",
     },
     {
       label: "Avg Reports / Case",
       value: avgReportsPerCase,
       icon: TrendingUp,
       hint: "Aggregation density",
+      accent: "success",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {cards.map((c) => (
-        <Card key={c.label} className="card-hover p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground">
-              {c.label}
-            </p>
-            <c.icon className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <p className="mt-1 text-2xl font-bold tabular-nums">
+        <MetricCard
+          key={c.label}
+          label={c.label}
+          icon={c.icon}
+          hint={c.hint}
+          accent={c.accent}
+          value={
             <AnimatedCounter
               value={c.value}
               decimals={Number.isInteger(c.value) ? 0 : 1}
             />
-          </p>
-          <p className="text-xs text-muted-foreground">{c.hint}</p>
-        </Card>
+          }
+        />
       ))}
     </div>
   );

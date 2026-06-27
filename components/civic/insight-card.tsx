@@ -18,14 +18,15 @@ export function InsightCard({ insight }: { insight: CivicInsight }) {
     <Card>
       <CardContent className="space-y-2 p-4">
         <div className="flex items-start gap-2">
-          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand/10 text-brand">
             <Icon className="h-4 w-4" />
           </span>
           <p className="font-semibold leading-snug">{insight.title}</p>
         </div>
         <p className="text-sm text-muted-foreground">{insight.why}</p>
-        <p className="text-xs text-slate-500">
-          <span className="font-medium">How:</span> {insight.how}
+        <p className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">How:</span>{" "}
+          {insight.how}
         </p>
         <TrustBadges mode="deterministic" confidence={insight.confidence} />
       </CardContent>
