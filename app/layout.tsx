@@ -14,6 +14,7 @@ import { LanguagePicker } from "@/components/i18n/language-picker";
 import { PageTransition } from "@/components/motion/page-transition";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { getInitialLocale } from "@/lib/i18n/server";
+import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -57,9 +58,28 @@ const notoTelugu = Noto_Sans_Telugu({
 });
 
 export const metadata: Metadata = {
-  title: "Velora Civic AI — AI Civic Operations Center",
-  description:
-    "An AI-powered civic intelligence platform. Citizens report issues; AI agents classify, score, aggregate, route, and help resolve them.",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: SITE.title,
+    template: "%s · Velora Civic AI",
+  },
+  description: SITE.description,
+  applicationName: SITE.name,
+  keywords: [...SITE.keywords],
+  authors: [{ name: "Velora Civic AI" }],
+  openGraph: {
+    type: "website",
+    url: SITE.url,
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
