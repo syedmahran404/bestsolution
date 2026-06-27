@@ -99,7 +99,7 @@ export function CivicMap({ markers }: CivicMapProps) {
 /** Inner surface — needs to be inside APIProvider to use the map instance. */
 function MapSurface({ markers }: CivicMapProps) {
   const map = useMap();
-  const [zoom, setZoom] = useState(INDIA_MAP_CONFIG.zoom);
+  const [zoom, setZoom] = useState<number>(INDIA_MAP_CONFIG.zoom);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Set<StatusGroup>>(
     () => new Set(["open", "progress", "resolved"]),

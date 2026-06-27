@@ -25,7 +25,10 @@ export function PageContainer({
   );
 }
 
-interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+interface PageHeaderProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title"
+> {
   title: React.ReactNode;
   description?: React.ReactNode;
   eyebrow?: React.ReactNode;
@@ -68,7 +71,10 @@ export function PageHeader({
   );
 }
 
-interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SectionHeaderProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title"
+> {
   title: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
