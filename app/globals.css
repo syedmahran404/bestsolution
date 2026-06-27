@@ -311,14 +311,26 @@
     background-size: 200% 100%;
   }
 
-  /* Accessibility: honor reduced-motion globally (expanded in motion layer). */
+  /* Accessibility (XC4): honor reduced-motion globally. Near-instant, non-zero
+     timings keep state changes perceivable while removing animation. The
+     class-level overrides below cover our named keyframe utilities. */
   @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
     .animate-fade-in-up,
     .animate-scale-in,
     .animate-shimmer,
+    .animate-pulse-ring,
     .card-hover {
       animation: none !important;
       transition: none !important;
+      transform: none !important;
     }
   }
 }
