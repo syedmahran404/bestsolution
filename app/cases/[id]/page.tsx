@@ -14,8 +14,10 @@ import { TransparencyPanel } from "@/components/operations/transparency-panel";
 import { OperationsTimeline } from "@/components/operations/operations-timeline";
 import { EscalationCard } from "@/components/cases/escalation-card";
 import { StatusManager } from "@/components/cases/status-manager";
+import { StatusBadge } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   AGGREGATION_RADIUS_M,
   CATEGORY_META,
@@ -70,6 +72,11 @@ export default async function CaseDetailPage({
   const reports = await getReportsForCase(params.id);
   const category = CATEGORY_META[civicCase.category];
   const status = STATUS_META[civicCase.status];
+  const statusCircle = {
+    open: "bg-status-open",
+    progress: "bg-status-progress",
+    resolved: "bg-status-resolved",
+  }[status.group];
   const intelligence = await getOrGenerateCaseIntelligence(civicCase, reports);
   const linkage = explainLinkage(civicCase);
 
@@ -134,8 +141,10 @@ export default async function CaseDetailPage({
           <CardHeader>
             <div className="flex items-center gap-4">
               <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white"
-                style={{ backgroundColor: status.hex }}
+                className={cn(
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white",
+                  statusCircle,
+                )}
               >
                 {civicCase.reportCount > 99 ? "99+" : civicCase.reportCount}
               </div>
@@ -150,12 +159,7 @@ export default async function CaseDetailPage({
                       Aggregated · {civicCase.reportCount} reports
                     </Badge>
                   )}
-                  <Badge
-                    variant="outline"
-                    style={{ borderColor: status.hex, color: status.hex }}
-                  >
-                    {status.label}
-                  </Badge>
+                  <StatusBadge status={civicCase.status} />
                 </div>
               </div>
             </div>
@@ -315,8 +319,8 @@ export default async function CaseDetailPage({
 
         {/* Member report locations */}
         <section className="space-y-2">
-          <h2 className="flex items-center gap-1.5 text-lg font-semibold">
-            <MapPin className="h-5 w-5" />
+          <h2 className="flex items-center gap-1.5 text-h3">
+            <MapPin className="h-5 w-5 text-brand" />
             Locations
           </h2>
           <div className="h-[40vh] min-h-[280px] w-full">
@@ -326,9 +330,7 @@ export default async function CaseDetailPage({
 
         {/* Linked reports */}
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">
-            Linked reports ({reports.length})
-          </h2>
+          <h2 className="text-h3">Linked reports ({reports.length})</h2>
 
           {reports.length === 0 ? (
             <p className="text-sm text-muted-foreground">
