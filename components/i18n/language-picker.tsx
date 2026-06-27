@@ -47,7 +47,7 @@ export function LanguagePicker() {
     >
       <div className="w-full max-w-md rounded-xl border bg-card p-6 text-card-foreground shadow-elevated">
         <div className="mb-4 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-sky-500 text-white shadow-sm">
+          <div className="bg-gradient-brand mb-3 flex h-11 w-11 items-center justify-center rounded-lg text-brand-foreground shadow-sm">
             <Globe className="h-5 w-5" />
           </div>
           <h2 className="text-lg font-semibold tracking-tight">

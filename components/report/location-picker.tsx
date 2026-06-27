@@ -281,7 +281,7 @@ export function LocationPicker({
         </>
       )}
 
-      {notice && <p className="text-xs text-amber-600">{notice}</p>}
+      {notice && <p className="text-xs text-warning">{notice}</p>}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

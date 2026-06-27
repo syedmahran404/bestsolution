@@ -97,7 +97,7 @@ export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
               <TrendBadge trend={city.trend} />
             </div>
             <p className="text-sm text-muted-foreground">{city.trendReason}</p>
-            <ul className="pt-1 text-xs text-slate-500">
+            <ul className="pt-1 text-xs text-muted-foreground">
               {city.factors.map((f) => (
                 <li key={f.label}>
                   {f.label}: {f.contribution >= 0 ? "+" : ""}

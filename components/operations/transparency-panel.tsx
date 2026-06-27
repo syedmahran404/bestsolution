@@ -71,7 +71,7 @@ export function TransparencyPanel({
         <div>
           <p className="text-xs font-medium text-muted-foreground">Decision</p>
           <p className="font-medium">{recommendation.label}</p>
-          <ul className="mt-1 space-y-0.5 text-xs text-slate-600">
+          <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
             {recommendation.reasoning.map((r, i) => (
               <li key={i}>• {r}</li>
             ))}
