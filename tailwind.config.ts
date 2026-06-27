@@ -10,12 +10,41 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1.25rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
+      screens: {
+        xs: "400px",
+      },
+      fontFamily: {
+        sans: [
+          "var(--font-sans)",
+          "var(--font-deva)",
+          "var(--font-knda)",
+          "var(--font-beng)",
+          "var(--font-telu)",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+        display: [
+          "var(--font-display)",
+          "var(--font-sans)",
+          "var(--font-deva)",
+          "system-ui",
+          "sans-serif",
+        ],
+        mono: [
+          "var(--font-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -50,7 +79,41 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Civic status palette (used by map markers + badges)
+        // Velora brand (signature gradient pair).
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+          2: "hsl(var(--brand-2))",
+          3: "hsl(var(--brand-3))",
+        },
+        // Semantic status palette.
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        critical: {
+          DEFAULT: "hsl(var(--critical))",
+          foreground: "hsl(var(--critical-foreground))",
+        },
+        neutral: {
+          DEFAULT: "hsl(var(--neutral))",
+          foreground: "hsl(var(--neutral-foreground))",
+        },
+        // Layered surfaces (depth without shadow).
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
+        },
+        // Civic status palette (map markers + status chips).
         status: {
           open: "hsl(var(--status-open))",
           progress: "hsl(var(--status-progress))",
@@ -58,14 +121,34 @@ const config: Config = {
         },
       },
       borderRadius: {
+        "2xl": "calc(var(--radius) + 6px)",
+        xl: "calc(var(--radius) + 2px)",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        soft: "0 1px 2px hsl(222 47% 11% / 0.04), 0 6px 20px -6px hsl(222 47% 11% / 0.08)",
-        elevated:
-          "0 2px 6px hsl(222 47% 11% / 0.06), 0 16px 40px -12px hsl(222 47% 11% / 0.16)",
+        // Elevation scale (Surface 1 → floating). Token-driven, theme-aware.
+        "elev-1": "var(--elev-1)",
+        "elev-2": "var(--elev-2)",
+        "elev-3": "var(--elev-3)",
+        "elev-4": "var(--elev-4)",
+        // Backward-compatible aliases (existing components).
+        soft: "var(--elev-2)",
+        elevated: "var(--elev-3)",
+      },
+      transitionDuration: {
+        "1": "var(--dur-1)",
+        "2": "var(--dur-2)",
+        "3": "var(--dur-3)",
+        "4": "var(--dur-4)",
+      },
+      transitionTimingFunction: {
+        standard: "var(--ease-standard)",
+        emphasized: "var(--ease-emphasized)",
+        decelerate: "var(--ease-decelerate)",
+        accelerate: "var(--ease-accelerate)",
+        spring: "var(--ease-spring)",
       },
       keyframes: {
         "accordion-down": {
@@ -98,8 +181,8 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-ring":
           "pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite",
-        "fade-in-up": "fade-in-up 0.4s ease-out both",
-        "scale-in": "scale-in 0.2s ease-out both",
+        "fade-in-up": "fade-in-up 0.4s var(--ease-emphasized) both",
+        "scale-in": "scale-in 0.2s var(--ease-emphasized) both",
         shimmer: "shimmer 1.6s linear infinite",
       },
     },
