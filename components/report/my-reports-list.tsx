@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Inbox } from "lucide-react";
 
 import { ReportCard } from "@/components/report/report-card";
 import { AIReasoningPanel } from "@/components/ai/ai-reasoning-panel";
+import { EmptyState } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getReporterId } from "@/lib/reporter";
@@ -44,8 +44,9 @@ export function MyReportsList() {
   if (error) {
     return (
       <EmptyState
+        illustration="error"
         title="Couldn't load your reports"
-        body="Something went wrong. Please try again later."
+        description="Something went wrong. Please try again later."
       />
     );
   }
@@ -63,9 +64,14 @@ export function MyReportsList() {
   if (reports.length === 0) {
     return (
       <EmptyState
+        illustration="reports"
         title="No reports yet"
-        body="Reports you submit from this device will appear here."
-        showCta
+        description="Reports you submit from this device will appear here."
+        action={
+          <Button asChild>
+            <Link href="/report">Report an issue</Link>
+          </Button>
+        }
       />
     );
   }
@@ -81,29 +87,6 @@ export function MyReportsList() {
           />
         </div>
       ))}
-    </div>
-  );
-}
-
-function EmptyState({
-  title,
-  body,
-  showCta,
-}: {
-  title: string;
-  body: string;
-  showCta?: boolean;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-16 text-center">
-      <Inbox className="h-8 w-8 text-muted-foreground" />
-      <p className="font-semibold">{title}</p>
-      <p className="max-w-sm text-sm text-muted-foreground">{body}</p>
-      {showCta && (
-        <Button asChild className="mt-2">
-          <Link href="/report">Report an issue</Link>
-        </Button>
-      )}
     </div>
   );
 }
