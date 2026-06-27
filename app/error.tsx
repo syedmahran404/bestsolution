@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { AlertTriangle, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
+import { Illustration } from "@/components/illustrations";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -21,12 +22,10 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-        <AlertTriangle className="h-6 w-6" />
-      </div>
-      <div className="space-y-1">
-        <h1 className="text-lg font-semibold">Something went wrong</h1>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-5 p-8 text-center">
+      <Illustration name="error" size="lg" />
+      <div className="space-y-1.5">
+        <h1 className="text-h2">Something went wrong</h1>
         <p className="max-w-md text-sm text-muted-foreground">
           An unexpected error occurred. You can try again — if it persists,
           please refresh the page.
