@@ -67,6 +67,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Multilingual font stack (V3): Inter for Latin, then per-script Noto faces
+       so Devanagari (Hindi/Marathi), Kannada, Bengali, and Telugu glyphs render
+       with correct typography. Browsers fall through to the face that has the
+       glyph, so all six locales display cleanly with one stack. */
+    font-family:
+      var(--font-sans), var(--font-deva), var(--font-knda), var(--font-beng),
+      var(--font-telu), ui-sans-serif, system-ui, sans-serif;
     /* Subtle environmental glow anchored top — signature ambient lighting. */
     background-image:
       radial-gradient(

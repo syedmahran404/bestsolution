@@ -23,6 +23,7 @@ import { CATEGORY_META } from "@/lib/constants";
 import { isFirebaseClientConfigured } from "@/lib/firebase/client";
 import { guessExtension, uploadToStorage } from "@/lib/firebase/upload";
 import { getReporterId } from "@/lib/reporter";
+import { useT } from "@/lib/i18n/provider";
 import {
   REPORT_CATEGORIES,
   reportFormSchema,
@@ -43,6 +44,7 @@ const DRAFT_KEY = "velora.report.draft";
 
 export function ReportForm() {
   const router = useRouter();
+  const t = useT();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -214,7 +216,7 @@ export function ReportForm() {
       {/* Category — the only always-required field */}
       <div className="space-y-1.5">
         <Label htmlFor="category">
-          What kind of issue? <span className="text-destructive">*</span>
+          {t("report.category")} <span className="text-destructive">*</span>
         </Label>
         <select
           id="category"
@@ -236,7 +238,7 @@ export function ReportForm() {
       {category === "other" && (
         <div className="space-y-1.5">
           <Label htmlFor="title">
-            Issue name <span className="text-destructive">*</span>
+            {t("report.issueName")} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="title"
@@ -278,7 +280,7 @@ export function ReportForm() {
 
       {/* Additional details (optional) */}
       <div className="space-y-1.5">
-        <Label htmlFor="description">Additional details (optional)</Label>
+        <Label htmlFor="description">{t("report.details")}</Label>
         <Textarea
           id="description"
           rows={3}
@@ -296,7 +298,7 @@ export function ReportForm() {
       <div className="space-y-2 rounded-md border bg-muted/30 p-3">
         <div className="flex items-center gap-1.5">
           <UserRound className="h-4 w-4 text-muted-foreground" />
-          <Label>Reporting as</Label>
+          <Label>{t("report.reportingAs")}</Label>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -305,7 +307,7 @@ export function ReportForm() {
             variant={verified ? "outline" : "default"}
             onClick={() => setVerified(false)}
           >
-            Anonymous
+            {t("report.anonymous")}
           </Button>
           <Button
             type="button"
@@ -314,26 +316,26 @@ export function ReportForm() {
             onClick={() => setVerified(true)}
           >
             <ShieldCheck className="mr-1.5 h-4 w-4" />
-            Verified citizen
+            {t("report.verified")}
           </Button>
         </div>
         {verified ? (
           <div className="space-y-2">
             <Input
-              placeholder="Your name *"
+              placeholder={`${t("report.name")} *`}
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={80}
             />
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Input
-                placeholder="Phone (optional)"
+                placeholder={t("report.phone")}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={20}
               />
               <Input
-                placeholder="Email (optional)"
+                placeholder={t("report.email")}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -365,12 +367,12 @@ export function ReportForm() {
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting report…
+            {t("report.submitting")}
           </>
         ) : (
           <>
             <Send className="mr-2 h-4 w-4" />
-            Submit report
+            {t("report.submit")}
           </>
         )}
       </Button>

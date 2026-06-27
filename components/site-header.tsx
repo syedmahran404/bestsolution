@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Activity } from "lucide-react";
 
+import { LanguageSelector } from "@/components/i18n/language-selector";
 import { NavLinks } from "@/components/nav-links";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -32,6 +33,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-1">
           <NavLinks />
           <span className="mx-1 hidden h-5 w-px bg-border sm:block" />
+          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>
