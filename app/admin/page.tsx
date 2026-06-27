@@ -11,6 +11,8 @@ import { HealthIndex } from "@/components/health/health-index";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { AlertRail } from "@/components/operations/command-center/alert-rail";
 import { PriorityBoard } from "@/components/operations/command-center/priority-board";
+import { ActivityStream } from "@/components/operations/command-center/activity-stream";
+import { OpsMap } from "@/components/operations/command-center/ops-map";
 import { EmptyState } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +20,7 @@ import { listCivicCases } from "@/lib/civic-cases";
 import { computeOperationsMetrics } from "@/lib/insights";
 import { computeCivicHealthOverview } from "@/lib/civic-health";
 import { computePriority } from "@/lib/operations";
+import { casesToMarkers } from "@/lib/map-markers";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicCase } from "@/types";
 
@@ -108,6 +111,8 @@ export default async function AdminPage() {
             {/* Command-center grid: operations main + live rail */}
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
               <div className="space-y-6 xl:col-span-2">
+                <OpsMap markers={casesToMarkers(cases)} />
+
                 <OpsCharts cases={cases} metrics={metrics} />
 
                 <PriorityBoard ranked={ranked.slice(0, 6)} />
@@ -153,10 +158,11 @@ export default async function AdminPage() {
                 <OpsAnalytics metrics={metrics} />
               </div>
 
-              {/* Live right rail */}
-              <aside className="space-y-6">
+              {/* Live right rail (AI dock + alerts + activity stay in view) */}
+              <aside className="space-y-6 xl:sticky xl:top-20 xl:self-start">
                 <AlertRail metrics={metrics} criticalCases={attentionCases} />
                 <OpsAgent />
+                <ActivityStream cases={cases} />
               </aside>
             </div>
           </>
