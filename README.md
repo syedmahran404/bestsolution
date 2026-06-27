@@ -83,35 +83,49 @@ Velora takes an issue from report to resolution:
 
 ## Features
 
-- Interactive **India civic map** (aggregated cases as numbered bubbles, single
-  reports as pins; status colors; selected-marker state).
+- **Multilingual (6 languages)** — English, Hindi, Kannada, Bengali, Marathi,
+  Telugu — with runtime switching, a header selector, a first-launch picker,
+  persisted preference, and per-script Noto fonts.
+- Interactive **India civic map** with **client-side clustering + density
+  bubbles**, **on-map status/category filter chips**, animated marker
+  selection, and a **responsive bottom-sheet preview** (card on desktop). Status
+  colors throughout; graceful no-API-key fallback.
 - **Citizen reporting**: **category-first** flow (category is the only required
   field), optional details, photo, **voice record/upload**. **Location by
   address search or one-tap GPS** — reverse-geocoded, so citizens never see or
   type coordinates (manual entry stays a collapsed fallback). **Anonymous or
   Verified Citizen** (optional name/phone/email for follow-up); drafts
-  auto-save; device-scoped "My Reports".
+  auto-save; device-scoped "My Reports" with a **civic-impact achievement** card.
 - **Visible AI reasoning** per report; **AI case summaries** + **agentic
-  operations brief** with confidence and trust indicators.
+  operations brief** with confidence and trust indicators; an **"Ask Velora"**
+  tool-using agent with a live thinking indicator.
 - **Deterministic aggregation engine** with a keyword false-merge guard.
 - **Context intelligence**: reverse-geocoded locality + nearby landmarks →
   explainable severity.
-- **Operations Center**: priority queue, status workflow (Reported → Verified →
-  In Progress → Resolved), operations timeline, decision-transparency panel.
+- **Mission Control operations center**: a command-center layout with an
+  **alert rail**, **priority board**, **AI dock**, **live activity stream**, and
+  an embedded ops map — over the status workflow (Reported → Verified → In
+  Progress → Resolved), operations timeline, and decision-transparency panel.
+- **Real analytics**: accessible, dependency-free **charts** (case status mix,
+  severity distribution, 7-day activity, category breakdown) — each with a
+  screen-reader data-table alternative.
 - **Civic Health Index** + explainable insights + community-impact estimates.
-- **Premium experience**: design system, light/dark theme, animated metrics,
-  motion that respects `prefers-reduced-motion`.
+- **Premium experience**: token-driven design system, light/dark theme,
+  brand/illustration kit, animated metrics, **page transitions, scroll reveals,
+  and resolution/submission celebrations** — all respecting
+  `prefers-reduced-motion`.
 
 ## Architecture
 
 ```
 Next.js 14 (App Router, RSC)              ── one app, one Vercel deploy
- ├─ Client: map, report form, voice recorder, filters, status mgr, theme
- ├─ Server components: home, admin, case detail, my reports
- └─ Route Handlers (/api): reports, cases, case status, agent
+ ├─ Client islands: map (+clustering/filters), report form, voice recorder,
+ │                  status mgr, theme + i18n providers, motion wrappers
+ ├─ Server components: home, Mission Control, case detail, my reports
+ └─ Route Handlers (/api): reports, cases, case status, agent, geo
         │
         ├─ Gemini 2.5 Flash    ── PERCEPTION ONLY (classify, transcribe, reason, summarize)
-        ├─ Deterministic core  ── distance, clustering, severity, priority, health, insights
+        ├─ Deterministic core  ── distance, clustering, severity, priority, health, insights, charts
         ├─ Google Maps Platform── map + Geocoding + Places (context)
         ├─ Firebase Firestore  ── reports, civicCases
         └─ Firebase Storage    ── photos, voice notes
@@ -151,6 +165,9 @@ unconfigured, reports still submit, aggregate, and get deterministic briefs.
 | AI       | Gemini 2.5 Flash (Google AI Studio)            |
 | Forms    | React Hook Form + Zod                          |
 | Geo      | geolib (haversine distance)                    |
+| i18n     | Lightweight 6-language provider + Noto fonts   |
+| Charts   | Dependency-free accessible SVG primitives      |
+| Motion   | CSS + Web Animations API (reduced-motion safe) |
 | Deploy   | Vercel                                         |
 
 ## Google Technologies
