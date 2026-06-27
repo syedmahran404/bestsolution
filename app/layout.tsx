@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import {
   Inter,
+  JetBrains_Mono,
   Noto_Sans_Bengali,
   Noto_Sans_Devanagari,
   Noto_Sans_Kannada,
   Noto_Sans_Telugu,
+  Sora,
 } from "next/font/google";
 
 import "./globals.css";
@@ -14,6 +16,20 @@ import { getInitialLocale } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+// Velora display face (BD1): geometric, confident headings. Body stays Inter.
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+// Monospace for data / metric / code typography.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 // Indic-script faces, loaded once and exposed as CSS variables. The body font
 // stack (globals.css) falls through these so Devanagari (Hindi/Marathi),
@@ -70,6 +86,8 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.variable,
+          sora.variable,
+          jetbrainsMono.variable,
           notoDevanagari.variable,
           notoKannada.variable,
           notoBengali.variable,

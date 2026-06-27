@@ -2,62 +2,163 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================================
+   VELORA 3.0 — DESIGN SYSTEM FOUNDATION (Phase 2A)
+   Token-driven identity. Every surface, component, and future phase
+   derives from these custom properties. No hard-coded colors downstream.
+   Light + dark are full peers; both are tuned for WCAG AA text contrast.
+   ===================================================================== */
+
 @layer base {
   :root {
-    /* Premium light identity (U5.1): cool near-white, deep ink, violet focus. */
-    --background: 210 25% 99%;
+    /* --- Core surfaces (Surface 0 → app background) --- */
+    --background: 220 33% 98.5%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 214 22% 96%;
-    --secondary-foreground: 222 47% 14%;
-    --muted: 214 22% 96%;
-    --muted-foreground: 215 16% 46%;
-    --accent: 214 22% 95%;
-    --accent-foreground: 222 47% 14%;
-    --destructive: 0 75% 56%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 24% 90%;
-    --input: 214 24% 89%;
-    /* Signature violet focus ring. */
-    --ring: 256 72% 62%;
-    --radius: 0.7rem;
 
-    /* Civic status palette */
-    --status-open: 0 84% 60%;
-    --status-progress: 38 92% 50%;
-    --status-resolved: 142 71% 45%;
+    /* Layered surface tints (Surface 1/2/3) for depth without shadow. */
+    --surface-1: 220 28% 97%;
+    --surface-2: 220 24% 95%;
+    --surface-3: 220 22% 93%;
+
+    /* --- Primary (solid ink action — Linear/Vercel lineage) --- */
+    --primary: 224 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 22% 95.5%;
+    --secondary-foreground: 222 47% 14%;
+    --muted: 220 22% 95.5%;
+    --muted-foreground: 220 12% 42%;
+    --accent: 222 24% 94.5%;
+    --accent-foreground: 222 47% 14%;
+
+    /* --- Velora brand (signature violet → cyan gradient pair) --- */
+    --brand: 256 84% 61%;
+    --brand-foreground: 0 0% 100%;
+    --brand-2: 199 89% 48%;
+    --brand-3: 268 80% 66%;
+    --brand-soft: 256 84% 61%;
+
+    /* --- Semantic status palette (each with a readable foreground) --- */
+    --success: 152 58% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 45%;
+    --warning-foreground: 30 60% 12%;
+    --info: 212 90% 50%;
+    --info-foreground: 0 0% 100%;
+    --critical: 0 74% 52%;
+    --critical-foreground: 0 0% 100%;
+    --neutral: 220 12% 42%;
+    --neutral-foreground: 0 0% 100%;
+
+    /* Destructive aliases critical (keeps existing component contracts). */
+    --destructive: 0 74% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* --- Lines & focus --- */
+    --border: 220 22% 89%;
+    --input: 220 22% 87%;
+    --ring: 256 84% 61%;
+    --radius: 0.75rem;
+
+    /* --- Civic status (map markers + status chips) mapped to semantics --- */
+    --status-open: 0 74% 54%;
+    --status-progress: 35 92% 48%;
+    --status-resolved: 152 58% 42%;
+
+    /* --- Motion tokens (consumed by utilities in the motion layer) --- */
+    --dur-1: 120ms;
+    --dur-2: 200ms;
+    --dur-3: 320ms;
+    --dur-4: 520ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+    --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+    --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --dist-sm: 6px;
+    --dist-md: 12px;
+    --dist-lg: 24px;
+
+    /* --- Elevation shadow scale (Surface 0 → tooltip) --- */
+    --shadow-color: 224 47% 11%;
+    --elev-1: 0 1px 2px hsl(var(--shadow-color) / 0.05);
+    --elev-2:
+      0 1px 2px hsl(var(--shadow-color) / 0.05),
+      0 4px 12px -4px hsl(var(--shadow-color) / 0.08);
+    --elev-3:
+      0 2px 6px hsl(var(--shadow-color) / 0.06),
+      0 14px 36px -12px hsl(var(--shadow-color) / 0.14);
+    --elev-4:
+      0 4px 10px hsl(var(--shadow-color) / 0.07),
+      0 28px 60px -16px hsl(var(--shadow-color) / 0.2);
+    --elev-ring: 0 0 0 1px hsl(var(--border) / 0.8);
   }
 
   .dark {
-    /* Premium dark identity: deep blue-black surfaces, layered elevation. */
-    --background: 222 32% 7%;
-    --foreground: 210 30% 96%;
-    --card: 222 26% 10%;
-    --card-foreground: 210 30% 96%;
-    --popover: 222 26% 10%;
-    --popover-foreground: 210 30% 96%;
-    --primary: 210 30% 96%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 222 18% 16%;
-    --secondary-foreground: 210 30% 96%;
-    --muted: 222 18% 15%;
-    --muted-foreground: 216 18% 64%;
-    --accent: 222 18% 17%;
-    --accent-foreground: 210 30% 96%;
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 16% 19%;
-    --input: 222 16% 21%;
-    --ring: 256 80% 72%;
+    /* Deep blue-black surfaces with layered elevation. */
+    --background: 224 40% 5.5%;
+    --foreground: 213 31% 95%;
+    --card: 223 32% 9%;
+    --card-foreground: 213 31% 95%;
+    --popover: 223 34% 8%;
+    --popover-foreground: 213 31% 95%;
 
-    --status-open: 0 84% 63%;
-    --status-progress: 38 92% 55%;
-    --status-resolved: 142 64% 50%;
+    --surface-1: 223 30% 10.5%;
+    --surface-2: 223 26% 13%;
+    --surface-3: 223 24% 16%;
+
+    --primary: 213 31% 95%;
+    --primary-foreground: 224 47% 11%;
+    --secondary: 223 22% 15%;
+    --secondary-foreground: 213 31% 95%;
+    --muted: 223 22% 14%;
+    --muted-foreground: 218 16% 65%;
+    --accent: 223 22% 16%;
+    --accent-foreground: 213 31% 95%;
+
+    --brand: 256 90% 72%;
+    --brand-foreground: 224 47% 11%;
+    --brand-2: 199 90% 58%;
+    --brand-3: 268 86% 75%;
+    --brand-soft: 256 90% 72%;
+
+    --success: 152 56% 48%;
+    --success-foreground: 152 80% 8%;
+    --warning: 38 92% 58%;
+    --warning-foreground: 30 70% 10%;
+    --info: 210 92% 62%;
+    --info-foreground: 212 80% 10%;
+    --critical: 0 72% 60%;
+    --critical-foreground: 0 0% 100%;
+    --neutral: 218 16% 65%;
+    --neutral-foreground: 224 47% 11%;
+
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 213 31% 95%;
+
+    --border: 223 18% 19%;
+    --input: 223 18% 22%;
+    --ring: 256 90% 74%;
+
+    --status-open: 0 76% 62%;
+    --status-progress: 38 92% 56%;
+    --status-resolved: 152 56% 50%;
+
+    --shadow-color: 224 60% 2%;
+    --elev-1: 0 1px 2px hsl(var(--shadow-color) / 0.4);
+    --elev-2:
+      0 1px 2px hsl(var(--shadow-color) / 0.4),
+      0 4px 12px -4px hsl(var(--shadow-color) / 0.5);
+    --elev-3:
+      0 2px 6px hsl(var(--shadow-color) / 0.5),
+      0 14px 36px -12px hsl(var(--shadow-color) / 0.6);
+    --elev-4:
+      0 4px 10px hsl(var(--shadow-color) / 0.55),
+      0 28px 60px -16px hsl(var(--shadow-color) / 0.7);
+    --elev-ring: 0 0 0 1px hsl(0 0% 100% / 0.06);
   }
 }
 
@@ -65,6 +166,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     /* Multilingual font stack (V3): Inter for Latin, then per-script Noto faces
@@ -74,38 +176,130 @@
     font-family:
       var(--font-sans), var(--font-deva), var(--font-knda), var(--font-beng),
       var(--font-telu), ui-sans-serif, system-ui, sans-serif;
-    /* Subtle environmental glow anchored top — signature ambient lighting. */
+    font-feature-settings:
+      "cv02" 1,
+      "cv03" 1,
+      "cv04" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    /* Signature ambient lighting: twin brand glows anchored top corners. */
     background-image:
       radial-gradient(
-        60rem 30rem at 85% -10%,
-        hsl(256 72% 62% / 0.06),
+        58rem 30rem at 88% -12%,
+        hsl(var(--brand) / 0.07),
         transparent 60%
       ),
       radial-gradient(
-        50rem 28rem at 0% 0%,
-        hsl(199 89% 48% / 0.05),
-        transparent 55%
+        46rem 26rem at -5% -8%,
+        hsl(var(--brand-2) / 0.06),
+        transparent 58%
       );
     background-attachment: fixed;
+  }
+
+  /* Display/heading typography uses the Velora display face. */
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family:
+      var(--font-display), var(--font-sans), var(--font-deva), system-ui,
+      sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* ---- Typography scale (BD1) ---- */
+  .text-display {
+    @apply font-display text-4xl font-bold tracking-tight sm:text-5xl;
+    line-height: 1.05;
+  }
+  .text-h1 {
+    @apply font-display text-3xl font-bold tracking-tight sm:text-4xl;
+    line-height: 1.1;
+  }
+  .text-h2 {
+    @apply font-display text-2xl font-semibold tracking-tight;
+    line-height: 1.2;
+  }
+  .text-h3 {
+    @apply font-display text-xl font-semibold tracking-tight;
+  }
+  .text-body {
+    @apply text-base leading-relaxed text-foreground;
+  }
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+  }
+  .text-label {
+    @apply text-sm font-medium leading-none;
+  }
+  .text-metric {
+    @apply font-display text-3xl font-bold tabular-nums tracking-tight;
+  }
+  .text-data {
+    @apply font-mono text-sm tabular-nums;
   }
 }
 
 @layer utilities {
-  /* Premium surfaces (U5.1) */
+  /* ---- Premium surfaces ---- */
   .glass {
     @apply border border-border/60 bg-background/70 backdrop-blur-xl;
   }
-  .text-gradient-brand {
-    @apply bg-gradient-to-r from-violet-600 to-sky-500 bg-clip-text text-transparent;
+  .glass-card {
+    background-color: hsl(var(--card) / 0.72);
+    @apply border border-border/60 backdrop-blur-xl;
+    box-shadow: var(--elev-3);
   }
+  .surface-1 {
+    background-color: hsl(var(--surface-1));
+  }
+  .surface-2 {
+    background-color: hsl(var(--surface-2));
+  }
+  .surface-3 {
+    background-color: hsl(var(--surface-3));
+  }
+
+  /* ---- Brand text + fills ---- */
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      100deg,
+      hsl(var(--brand)),
+      hsl(var(--brand-2))
+    );
+    @apply bg-clip-text text-transparent;
+  }
+  .bg-gradient-brand {
+    background-image: linear-gradient(
+      120deg,
+      hsl(var(--brand)),
+      hsl(var(--brand-3)) 55%,
+      hsl(var(--brand-2))
+    );
+  }
+  .hero-surface {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--brand) / 0.12),
+      hsl(var(--brand-2) / 0.06) 45%,
+      transparent
+    );
+  }
+  .ring-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
   /* Subtle lift + elevation on interactive cards. */
   .card-hover {
-    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated;
+    @apply transition-all duration-200 hover:-translate-y-0.5;
   }
-  /* Signature hero surface gradient + ring. */
-  .hero-surface {
-    @apply bg-gradient-to-br from-violet-600/10 via-sky-500/5 to-transparent;
+  .card-hover:hover {
+    box-shadow: var(--elev-3);
   }
+
   /* Shimmer skeleton fill. */
   .shimmer {
     background-image: linear-gradient(
@@ -117,12 +311,26 @@
     background-size: 200% 100%;
   }
 
+  /* Accessibility (XC4): honor reduced-motion globally. Near-instant, non-zero
+     timings keep state changes perceivable while removing animation. The
+     class-level overrides below cover our named keyframe utilities. */
   @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
     .animate-fade-in-up,
+    .animate-scale-in,
     .animate-shimmer,
+    .animate-pulse-ring,
     .card-hover {
       animation: none !important;
       transition: none !important;
+      transform: none !important;
     }
   }
 }
