@@ -3,7 +3,7 @@ import { FilePlus2 } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { MyReportsList } from "@/components/report/my-reports-list";
-import { InfoBanner } from "@/components/brand";
+import { ReportSubmitted } from "@/components/report/report-submitted";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -25,29 +25,13 @@ export default function ReportsPage({
 }) {
   const justSubmitted = searchParams?.submitted === "1";
   const voiceCount = Number(searchParams?.count ?? "1");
-  const ordinal =
-    voiceCount === 1
-      ? "1st"
-      : voiceCount === 2
-        ? "2nd"
-        : voiceCount === 3
-          ? "3rd"
-          : `${voiceCount}th`;
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
 
       <main className="container max-w-3xl flex-1 py-8">
-        {justSubmitted && (
-          <div className="mb-4">
-            <InfoBanner tone="success" title="Report submitted">
-              {voiceCount > 1
-                ? `You're the ${ordinal} voice on this issue. Your report strengthened an existing civic case, making it harder to ignore.`
-                : "Your report was analyzed and started a new civic case."}
-            </InfoBanner>
-          </div>
-        )}
+        {justSubmitted && <ReportSubmitted voiceCount={voiceCount} />}
 
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="space-y-1">
