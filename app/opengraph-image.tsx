@@ -3,9 +3,14 @@ import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/site";
 
 /**
- * Generated OpenGraph / social-share card (App Router convention). Rendered at
- * build/request time with system fonts — no static asset or network fetch.
+ * Generated OpenGraph / social-share card (App Router convention).
+ *
+ * Runs on the EDGE runtime: this is @vercel/og's native environment. The Node
+ * static-generation pass of `next build` cannot resolve next/og's internal
+ * font/resvg asset URL and throws "TypeError: Invalid URL"; the edge runtime
+ * resolves it correctly and renders the card on demand (cached).
  */
+export const runtime = "edge";
 export const alt = SITE.title;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
