@@ -167,6 +167,10 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "none" },
         },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
         "scale-in": {
           from: { opacity: "0", transform: "scale(0.97)" },
           to: { opacity: "1", transform: "scale(1)" },
@@ -182,6 +186,7 @@ const config: Config = {
         "pulse-ring":
           "pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite",
         "fade-in-up": "fade-in-up 0.4s var(--ease-emphasized) both",
+        "fade-in": "fade-in 0.3s var(--ease-standard) both",
         "scale-in": "scale-in 0.2s var(--ease-emphasized) both",
         shimmer: "shimmer 1.6s linear infinite",
       },
