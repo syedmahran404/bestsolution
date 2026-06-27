@@ -1,8 +1,8 @@
 import { MapPin, Mic, Clock } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/brand";
 import { Card } from "@/components/ui/card";
-import { CATEGORY_META, STATUS_META } from "@/lib/constants";
+import { CATEGORY_META } from "@/lib/constants";
 import type { CivicReport } from "@/types";
 
 function formatDate(iso: string): string {
@@ -19,7 +19,6 @@ function formatDate(iso: string): string {
 /** A single submitted report in the "My Reports" list. */
 export function ReportCard({ report }: { report: CivicReport }) {
   const category = CATEGORY_META[report.category];
-  const status = STATUS_META[report.status];
 
   return (
     <Card className="flex gap-4 p-4">
@@ -43,16 +42,9 @@ export function ReportCard({ report }: { report: CivicReport }) {
           <h3 className="truncate font-semibold">{report.title}</h3>
           <div className="flex shrink-0 items-center gap-1.5">
             {report.severityLabel && (
-              <Badge variant="secondary" className="capitalize">
-                {report.severityLabel}
-              </Badge>
+              <PriorityBadge severity={report.severityLabel} />
             )}
-            <Badge
-              variant="outline"
-              style={{ borderColor: status.hex, color: status.hex }}
-            >
-              {status.label}
-            </Badge>
+            <StatusBadge status={report.status} />
           </div>
         </div>
 

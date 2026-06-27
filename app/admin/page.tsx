@@ -8,6 +8,7 @@ import { OpsAnalytics } from "@/components/admin/ops-analytics";
 import { ExecutiveMetrics } from "@/components/admin/executive-metrics";
 import { HealthIndex } from "@/components/health/health-index";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
+import { EmptyState } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,9 +56,7 @@ export default async function AdminPage() {
       <main className="container flex-1 space-y-6 py-6">
         <div className="flex items-center justify-between gap-3">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Operations Center
-            </h1>
+            <h1 className="text-h1">Operations Center</h1>
             <p className="text-sm text-muted-foreground">
               Civic intelligence overview and case management.
             </p>
@@ -71,18 +70,17 @@ export default async function AdminPage() {
         </div>
 
         {!isFirebaseAdminConfigured ? (
-          <Card>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Backend not configured. Set FIREBASE_SERVICE_ACCOUNT_KEY to load
-              operations data.
-            </CardContent>
-          </Card>
+          <EmptyState
+            illustration="offline"
+            title="Backend not configured"
+            description="Set FIREBASE_SERVICE_ACCOUNT_KEY to load operations data."
+          />
         ) : loadError ? (
-          <Card>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Couldn&apos;t load operations data. Please try again later.
-            </CardContent>
-          </Card>
+          <EmptyState
+            illustration="error"
+            title="Couldn't load operations data"
+            description="Something went wrong fetching civic cases. Please try again later."
+          />
         ) : (
           <>
             <OpsAgent />

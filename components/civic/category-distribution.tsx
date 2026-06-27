@@ -32,7 +32,7 @@ export function CategoryDistribution({ cases }: { cases: CivicCase[] }) {
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-500 transition-all"
+                className="bg-gradient-brand h-full rounded-full transition-all"
                 style={{ width: `${Math.round((count / max) * 100)}%` }}
               />
             </div>

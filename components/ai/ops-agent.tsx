@@ -64,9 +64,9 @@ export function OpsAgent() {
   }
 
   return (
-    <Card className="border-violet-200">
+    <Card className="border-brand/20">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-1.5 text-base text-violet-900">
+        <CardTitle className="flex items-center gap-1.5 text-base text-brand">
           <Sparkles className="h-4 w-4" />
           Ask Velora
         </CardTitle>
@@ -125,10 +125,8 @@ export function OpsAgent() {
                 <ol className="space-y-1">
                   {result.steps.map((s, i) => (
                     <li key={i} className="text-xs text-muted-foreground">
-                      <span className="font-mono text-violet-700">
-                        {s.tool}
-                      </span>{" "}
-                      → {s.detail}
+                      <span className="font-mono text-brand">{s.tool}</span> →{" "}
+                      {s.detail}
                     </li>
                   ))}
                 </ol>
@@ -136,12 +134,12 @@ export function OpsAgent() {
             )}
 
             {/* Answer */}
-            <div className="rounded-md border bg-violet-50/50 p-3">
+            <div className="rounded-md border border-brand/20 bg-brand/5 p-3">
               <div className="mb-1 flex items-center gap-1.5">
                 {result.needsClarification ? (
-                  <HelpCircle className="h-4 w-4 text-amber-600" />
+                  <HelpCircle className="h-4 w-4 text-warning" />
                 ) : (
-                  <Sparkles className="h-4 w-4 text-violet-700" />
+                  <Sparkles className="h-4 w-4 text-brand" />
                 )}
                 <Badge variant="secondary">
                   {result.generatedBy === "ai" ? "AI + tools" : "Deterministic"}
@@ -150,7 +148,7 @@ export function OpsAgent() {
                   <Badge variant="secondary">Needs clarification</Badge>
                 )}
               </div>
-              <p className="text-sm text-slate-800">
+              <p className="text-sm text-foreground">
                 {result.answer.replace(/^CLARIFY:\s*/i, "")}
               </p>
             </div>

@@ -11,10 +11,10 @@ interface CaseSummaryCardProps {
 /** AI-generated civic case summary + community impact (Phase 4, Feature 5). */
 export function CaseSummaryCard({ summary, impact }: CaseSummaryCardProps) {
   return (
-    <Card className="border-violet-200 bg-violet-50/50">
+    <Card className="border-brand/20 bg-brand/5">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="flex items-center gap-1.5 text-base text-violet-900">
+          <CardTitle className="flex items-center gap-1.5 text-base text-brand">
             <Sparkles className="h-4 w-4" />
             AI Case Summary
           </CardTitle>
@@ -22,11 +22,11 @@ export function CaseSummaryCard({ summary, impact }: CaseSummaryCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        <p className="text-slate-800">{summary}</p>
+        <p className="text-foreground">{summary}</p>
         <p className="flex items-start gap-1.5 text-muted-foreground">
           <Users className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
-            <span className="font-medium text-slate-700">
+            <span className="font-medium text-foreground">
               Community impact:
             </span>{" "}
             {impact}

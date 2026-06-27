@@ -4,14 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  AlertCircle,
-  Loader2,
-  Send,
-  UserRound,
-  ShieldCheck,
-} from "lucide-react";
+import { Loader2, Send, UserRound, ShieldCheck } from "lucide-react";
 
+import { InfoBanner } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -203,14 +198,10 @@ export function ReportForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {!isFirebaseClientConfigured && (
-        <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>
-            Firebase is not configured yet. Set the{" "}
-            <code>NEXT_PUBLIC_FIREBASE_*</code> environment variables to enable
-            media uploads and submission.
-          </p>
-        </div>
+        <InfoBanner tone="warning" title="Firebase is not configured yet">
+          Set the <code>NEXT_PUBLIC_FIREBASE_*</code> environment variables to
+          enable media uploads and submission.
+        </InfoBanner>
       )}
 
       {/* Category — the only always-required field */}
@@ -357,10 +348,9 @@ export function ReportForm() {
       </div>
 
       {submitError && (
-        <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>{submitError}</p>
-        </div>
+        <InfoBanner tone="critical" title="Couldn't submit report">
+          {submitError}
+        </InfoBanner>
       )}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>

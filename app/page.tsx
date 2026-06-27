@@ -7,6 +7,7 @@ import { HealthIndex } from "@/components/health/health-index";
 import { InsightCard } from "@/components/civic/insight-card";
 import { CategoryDistribution } from "@/components/civic/category-distribution";
 import { CivicCaseCard } from "@/components/cases/civic-case-card";
+import { SectionHeader } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_META } from "@/lib/constants";
@@ -84,11 +85,11 @@ export default async function HomePage() {
 
       <main className="container flex flex-1 flex-col gap-6 py-6">
         {/* Hero */}
-        <section className="animate-fade-in-up hero-surface overflow-hidden rounded-2xl border p-6 sm:p-8">
+        <section className="animate-fade-in-up hero-surface overflow-hidden rounded-2xl border border-border/70 p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-2xl space-y-2">
-              <Badge variant="secondary">AI Civic Intelligence</Badge>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <div className="max-w-2xl space-y-2.5">
+              <Badge variant="brand">AI Civic Intelligence</Badge>
+              <h1 className="text-h1">
                 India{" "}
                 <span className="text-gradient-brand">Civic Operations</span>{" "}
                 Center
@@ -100,7 +101,7 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="flex shrink-0 gap-2">
-              <Button asChild>
+              <Button asChild variant="brand">
                 <Link href="/report">Report an issue</Link>
               </Button>
               <Button asChild variant="outline">
@@ -123,9 +124,7 @@ export default async function HomePage() {
         {usingLiveData && (insights.length > 0 || cases.length > 0) && (
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="space-y-3 lg:col-span-2">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Explainable civic insights
-              </h2>
+              <SectionHeader title="Explainable civic insights" />
               {insights.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {insights.map((ins) => (
@@ -139,9 +138,7 @@ export default async function HomePage() {
               )}
             </div>
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Distribution
-              </h2>
+              <SectionHeader title="Distribution" />
               <CategoryDistribution cases={cases} />
             </div>
           </section>
@@ -150,9 +147,7 @@ export default async function HomePage() {
         {/* Civic cases */}
         {usingLiveData && (
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold tracking-tight">
-              Civic cases
-            </h2>
+            <SectionHeader title="Civic cases" />
             <div className="space-y-3">
               {cases.slice(0, 10).map((c) => (
                 <div key={c.id} className="card-hover rounded-lg">
@@ -164,10 +159,15 @@ export default async function HomePage() {
         )}
       </main>
 
-      <footer className="border-t py-4">
-        <div className="container text-center text-xs text-muted-foreground">
-          Velora Civic AI · AI Civic Operations Center · Built for the Vibe2Ship
-          Hackathon
+      <footer className="border-t border-border/70 py-5">
+        <div className="container flex flex-col items-center justify-between gap-2 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
+          <span>
+            <span className="font-display font-semibold text-foreground">
+              Velora Civic AI
+            </span>{" "}
+            · AI Civic Operations Center
+          </span>
+          <span>Built for the Vibe2Ship Hackathon</span>
         </div>
       </footer>
     </div>

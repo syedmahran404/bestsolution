@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { MapPin, Layers, ChevronRight } from "lucide-react";
 
+import { StatusBadge } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { CATEGORY_META, STATUS_META } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { CivicCase } from "@/types";
+
+const STATUS_CIRCLE: Record<"open" | "progress" | "resolved", string> = {
+  open: "bg-status-open",
+  progress: "bg-status-progress",
+  resolved: "bg-status-resolved",
+};
 
 /** Compact civic case row linking to the case detail page. */
 export function CivicCaseCard({ civicCase }: { civicCase: CivicCase }) {
@@ -13,11 +21,13 @@ export function CivicCaseCard({ civicCase }: { civicCase: CivicCase }) {
   const aggregated = civicCase.reportCount > 1;
 
   return (
-    <Link href={`/cases/${civicCase.id}`}>
-      <Card className="flex items-center gap-4 p-4 transition-colors hover:bg-accent/50">
+    <Link href={`/cases/${civicCase.id}`} className="group block">
+      <Card className="flex items-center gap-4 p-4 transition-colors duration-150 hover:border-brand/40 hover:bg-accent/50">
         <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-          style={{ backgroundColor: status.hex }}
+          className={cn(
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white",
+            STATUS_CIRCLE[status.group],
+          )}
         >
           {civicCase.reportCount > 99 ? "99+" : civicCase.reportCount}
         </div>
@@ -34,7 +44,7 @@ export function CivicCaseCard({ civicCase }: { civicCase: CivicCase }) {
               </Badge>
             )}
           </div>
-          <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <span>
               {civicCase.reportCount} report
               {civicCase.reportCount === 1 ? "" : "s"}
@@ -44,16 +54,11 @@ export function CivicCaseCard({ civicCase }: { civicCase: CivicCase }) {
               {civicCase.centerLocation.lat.toFixed(4)},{" "}
               {civicCase.centerLocation.lng.toFixed(4)}
             </span>
-            <Badge
-              variant="outline"
-              style={{ borderColor: status.hex, color: status.hex }}
-            >
-              {status.label}
-            </Badge>
+            <StatusBadge status={civicCase.status} />
           </div>
         </div>
 
-        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-foreground" />
       </Card>
     </Link>
   );

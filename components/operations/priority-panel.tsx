@@ -1,18 +1,20 @@
 import { Gauge, Users, Layers, MapPin } from "lucide-react";
 
+import { PriorityBadge } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type {
   PriorityAssessment,
   Recommendation,
   SeverityLabel,
 } from "@/types";
 
-const PRIORITY_HEX: Record<SeverityLabel, string> = {
-  low: "#22c55e",
-  medium: "#f59e0b",
-  high: "#f97316",
-  critical: "#ef4444",
+const PRIORITY_BG: Record<SeverityLabel, string> = {
+  low: "bg-success",
+  medium: "bg-info",
+  high: "bg-warning",
+  critical: "bg-critical",
 };
 
 /**
@@ -27,8 +29,6 @@ export function PriorityPanel({
   priority: PriorityAssessment;
   recommendation: Recommendation;
 }) {
-  const hex = PRIORITY_HEX[priority.label];
-
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -40,22 +40,18 @@ export function PriorityPanel({
       <CardContent className="space-y-4 text-sm">
         <div className="flex items-center gap-4">
           <div
-            className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full text-white"
-            style={{ backgroundColor: hex }}
+            className={cn(
+              "flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full text-white",
+              PRIORITY_BG[priority.label],
+            )}
           >
             <span className="text-xl font-bold leading-none">
               {priority.score}
             </span>
             <span className="text-[10px] uppercase">/ 100</span>
           </div>
-          <div className="space-y-1">
-            <Badge
-              variant="outline"
-              className="capitalize"
-              style={{ borderColor: hex, color: hex }}
-            >
-              {priority.label} priority
-            </Badge>
+          <div className="space-y-1.5">
+            <PriorityBadge severity={priority.label} />
             <p className="text-xs text-muted-foreground">
               {Math.round(priority.confidence * 100)}% confidence · computed
               deterministically

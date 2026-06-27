@@ -27,16 +27,16 @@ export function AIReasoningPanel({
   const confidencePct = Math.round(analysis.confidence * 100);
 
   return (
-    <div className="rounded-md border border-violet-200 bg-violet-50/60 p-3 text-sm">
+    <div className="rounded-md border border-brand/20 bg-brand/5 p-3 text-sm">
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 font-semibold text-violet-900">
+        <span className="inline-flex items-center gap-1.5 font-semibold text-brand">
           <Sparkles className="h-4 w-4" />
           AI Analysis
         </span>
         <Badge variant="secondary">{confidencePct}% confidence</Badge>
       </div>
 
-      <div className="space-y-1.5 text-slate-700">
+      <div className="space-y-1.5 text-foreground">
         <p>
           <span className="font-medium">Category:</span> {aiCat.glyph}{" "}
           {aiCat.label}
@@ -66,7 +66,7 @@ export function AIReasoningPanel({
         <p className="text-muted-foreground">{analysis.summary}</p>
 
         {analysis.transcript && (
-          <div className="mt-1 flex gap-1.5 rounded bg-white/70 p-2 text-xs text-slate-600">
+          <div className="mt-1 flex gap-1.5 rounded bg-card/70 p-2 text-xs text-muted-foreground ring-1 ring-border/60">
             <Quote className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>
               <span className="font-medium">Voice transcript:</span>{" "}

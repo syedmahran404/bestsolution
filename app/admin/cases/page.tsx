@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { CaseFilters } from "@/components/admin/case-filters";
+import { EmptyState } from "@/components/brand";
 import { listCivicCases } from "@/lib/civic-cases";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import type { CivicCase } from "@/types";
@@ -36,9 +37,7 @@ export default async function AdminCasesPage() {
         </Link>
 
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Civic Case Management
-          </h1>
+          <h1 className="text-h1">Civic Case Management</h1>
           <p className="text-sm text-muted-foreground">
             Search and filter civic cases. Open a case to inspect reports, AI
             analysis, and manage its status.
@@ -46,10 +45,11 @@ export default async function AdminCasesPage() {
         </div>
 
         {!isFirebaseAdminConfigured ? (
-          <p className="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground">
-            Backend not configured. Set FIREBASE_SERVICE_ACCOUNT_KEY to load
-            cases.
-          </p>
+          <EmptyState
+            illustration="offline"
+            title="Backend not configured"
+            description="Set FIREBASE_SERVICE_ACCOUNT_KEY to load civic cases."
+          />
         ) : (
           <CaseFilters cases={cases} />
         )}

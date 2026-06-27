@@ -1,15 +1,8 @@
 import { MapPin, Landmark, ShieldAlert, Info } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { PriorityBadge } from "@/components/brand";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ContextFactor, SeverityLabel } from "@/types";
-
-const SEVERITY_HEX: Record<SeverityLabel, string> = {
-  low: "#22c55e",
-  medium: "#f59e0b",
-  high: "#f97316",
-  critical: "#ef4444",
-};
 
 interface ContextCardProps {
   locality?: string | null;
@@ -54,16 +47,11 @@ export function ContextCard({
             Civic context
           </CardTitle>
           {severityLabel && (
-            <Badge
-              variant="outline"
-              style={{
-                borderColor: SEVERITY_HEX[severityLabel],
-                color: SEVERITY_HEX[severityLabel],
-              }}
-            >
-              Severity: {severityLabel}
-              {typeof severityScore === "number" ? ` (${severityScore})` : ""}
-            </Badge>
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              Severity
+              <PriorityBadge severity={severityLabel} />
+              {typeof severityScore === "number" ? `(${severityScore})` : ""}
+            </span>
           )}
         </div>
       </CardHeader>
@@ -89,7 +77,8 @@ export function ContextCard({
                   className="flex items-center justify-between gap-2"
                 >
                   <span className="capitalize">
-                    {f.type} · <span className="text-slate-600">{f.name}</span>
+                    {f.type} ·{" "}
+                    <span className="text-muted-foreground">{f.name}</span>
                   </span>
                   <span className="text-xs text-muted-foreground tabular-nums">
                     {f.distanceM}m
@@ -106,7 +95,7 @@ export function ContextCard({
               <ShieldAlert className="h-3.5 w-3.5" />
               Why this severity
             </p>
-            <ul className="space-y-0.5 text-xs text-slate-600">
+            <ul className="space-y-0.5 text-xs text-muted-foreground">
               {severityReasons.map((r, i) => (
                 <li key={i}>• {r}</li>
               ))}

@@ -1,15 +1,9 @@
 import { Sparkles, Cpu, ListChecks, AlertTriangle, Link2 } from "lucide-react";
 
+import { PriorityBadge } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { OperationsBrief, SeverityLabel } from "@/types";
-
-const PRIORITY_HEX: Record<SeverityLabel, string> = {
-  low: "#22c55e",
-  medium: "#f59e0b",
-  high: "#f97316",
-  critical: "#ef4444",
-};
+import type { OperationsBrief } from "@/types";
 
 /**
  * Explainable AI Operations Brief (U3). Every conclusion is shown — current
@@ -18,10 +12,10 @@ const PRIORITY_HEX: Record<SeverityLabel, string> = {
  */
 export function OperationsBriefPanel({ brief }: { brief: OperationsBrief }) {
   return (
-    <Card className="border-violet-200 bg-violet-50/50">
+    <Card className="border-brand/20 bg-brand/5">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="flex items-center gap-1.5 text-base text-violet-900">
+          <CardTitle className="flex items-center gap-1.5 text-base text-brand">
             <Sparkles className="h-4 w-4" />
             AI Operations Brief
           </CardTitle>
@@ -47,16 +41,7 @@ export function OperationsBriefPanel({ brief }: { brief: OperationsBrief }) {
           <span className="text-xs font-medium text-muted-foreground">
             Recommended priority
           </span>
-          <Badge
-            variant="outline"
-            className="capitalize"
-            style={{
-              borderColor: PRIORITY_HEX[brief.recommendedPriority],
-              color: PRIORITY_HEX[brief.recommendedPriority],
-            }}
-          >
-            {brief.recommendedPriority}
-          </Badge>
+          <PriorityBadge severity={brief.recommendedPriority} />
         </div>
 
         {brief.nextActions.length > 0 && (
@@ -67,9 +52,12 @@ export function OperationsBriefPanel({ brief }: { brief: OperationsBrief }) {
             </p>
             <ul className="space-y-1.5">
               {brief.nextActions.map((a, i) => (
-                <li key={i} className="rounded-md bg-white/70 p-2">
-                  <p className="font-medium text-slate-800">{a.action}</p>
-                  <p className="text-xs text-slate-600">{a.reason}</p>
+                <li
+                  key={i}
+                  className="rounded-md bg-card/70 p-2 ring-1 ring-border/60"
+                >
+                  <p className="font-medium text-foreground">{a.action}</p>
+                  <p className="text-xs text-muted-foreground">{a.reason}</p>
                 </li>
               ))}
             </ul>
@@ -82,7 +70,7 @@ export function OperationsBriefPanel({ brief }: { brief: OperationsBrief }) {
               <Link2 className="h-3.5 w-3.5" />
               Dependencies
             </p>
-            <ul className="list-inside list-disc text-xs text-slate-600">
+            <ul className="list-inside list-disc text-xs text-muted-foreground">
               {brief.dependencies.map((d, i) => (
                 <li key={i}>{d}</li>
               ))}
@@ -96,7 +84,7 @@ export function OperationsBriefPanel({ brief }: { brief: OperationsBrief }) {
               <AlertTriangle className="h-3.5 w-3.5" />
               Potential risks
             </p>
-            <ul className="list-inside list-disc text-xs text-slate-600">
+            <ul className="list-inside list-disc text-xs text-muted-foreground">
               {brief.risks.map((r, i) => (
                 <li key={i}>{r}</li>
               ))}
@@ -112,7 +100,7 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="text-slate-800">{value}</p>
+      <p className="text-foreground">{value}</p>
     </div>
   );
 }

@@ -22,11 +22,14 @@ export default function ReportPage() {
 
       <main className="container max-w-2xl flex-1 py-8">
         <div className="mb-6 space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Report an issue</h1>
+          <h1 className="text-h1">Report an issue</h1>
           <p className="text-sm text-muted-foreground">
             Help your community. Add a photo or voice note, mark the location,
             and submit. You can track it on{" "}
-            <Link href="/reports" className="text-primary hover:underline">
+            <Link
+              href="/reports"
+              className="font-medium text-brand hover:underline"
+            >
               My Reports
             </Link>
             .
