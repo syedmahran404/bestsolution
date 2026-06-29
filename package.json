@@ -2,7 +2,7 @@
   "name": "velora-civic-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "Velora Civic AI - An AI Civic Operations Center. Phase 1: Foundation & Infrastructure.",
+  "description": "Velora Civic AI — an AI Civic Operations Center. Citizens report hyperlocal issues by photo or voice in any of 6 languages; Gemini classifies and explains them, a deterministic engine aggregates many reports into one prioritized civic case, and an operations center tracks each to resolution with a living Civic Health Index.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

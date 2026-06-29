@@ -117,6 +117,44 @@ Velora takes an issue from report to resolution:
 
 ## Architecture
 
+```mermaid
+flowchart TD
+  Citizen([Citizen]) -->|photo / voice / location| Report[Report Flow]
+  Judge([Operator / Judge]) --> Ops[Mission Control]
+
+  subgraph App["Next.js 14 · App Router · one Vercel deploy"]
+    Report --> API["/api Route Handlers"]
+    Ops --> API
+    Search[Global Search ⌘K] --> Index[(In-memory index)]
+    I18N[i18n · 6 locales]
+  end
+
+  subgraph Perception["AI — perception only"]
+    Gemini[Gemini 2.5 Flash<br/>classify · transcribe · reason · summarize]
+  end
+
+  subgraph Deterministic["Deterministic core — fast, free, explainable"]
+    Cluster[Clustering & aggregation]
+    Severity[Context-aware severity]
+    Priority[Priority & recommendations]
+    Health[Civic Health Index]
+  end
+
+  subgraph Google["Google Cloud"]
+    Maps[Google Maps · Geocoding · Places]
+    FS[(Firebase Firestore)]
+    Storage[(Firebase Storage)]
+  end
+
+  API --> Gemini
+  API --> Cluster
+  API --> Maps
+  Cluster --> Severity --> Priority --> Health
+  API --> FS
+  API --> Storage
+  Maps --> Severity
+```
+
 ```
 Next.js 14 (App Router, RSC)              ── one app, one Vercel deploy
  ├─ Client islands: map (+clustering/filters), report form, voice recorder,
@@ -180,12 +218,28 @@ unconfigured, reports still submit, aggregate, and get deterministic briefs.
 
 ## Screenshots & Demo
 
-> Add before submission:
->
-> - `docs/screenshots/` — home (Civic Health Index), case detail (AI brief +
->   transparency), operations dashboard, report flow.
-> - Demo GIF / video link.
-> - Live deployment URL.
+### Live Demo
+
+🔗 **Live app:** _add your Vercel URL here_ (e.g. `https://velora-civic-ai.vercel.app`)
+
+### Demo Video
+
+🎥 **Walkthrough (90s):** _add your demo video link here_ — see [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md) for the exact narration, click order, and timing.
+
+### Screenshots
+
+> Capture guide and exact framing for the 8 hero shots:
+> [`docs/SCREENSHOT_PLAN.md`](./docs/SCREENSHOT_PLAN.md).
+> Save captures to `docs/screenshots/` and they will render below.
+
+| | |
+| --- | --- |
+| ![Landing — Civic Health Index](docs/screenshots/01-landing.png) | ![Report an issue](docs/screenshots/02-report.png) |
+| ![Operations Center](docs/screenshots/03-operations.png) | ![Global search (⌘K)](docs/screenshots/04-search.png) |
+| ![AI case detail](docs/screenshots/05-case-detail.png) | ![India civic map](docs/screenshots/06-map.png) |
+| ![Localization (6 languages)](docs/screenshots/07-localization.png) | ![Mobile view](docs/screenshots/08-mobile.png) |
+
+_Images are placeholders until captured; the layout above renders automatically once the files exist._
 
 ## Installation
 
