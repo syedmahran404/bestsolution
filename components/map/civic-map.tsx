@@ -13,6 +13,7 @@ import {
 } from "@/lib/constants";
 import { clusterMarkers } from "@/lib/map-cluster";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
 import type { CivicMapMarker, IssueCategory } from "@/types";
 import { MapLegend } from "@/components/map/map-legend";
 import { MapFilters, type StatusGroup } from "@/components/map/map-filters";
@@ -75,7 +76,12 @@ export function CivicMap({ markers }: CivicMapProps) {
   if (!apiKey) {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/40 p-8 text-center">
-        <p className="text-lg font-semibold">Velora Civic Map</p>
+        <p className="text-lg font-semibold">
+          {
+            // i18n-exempt — brand name
+            "Velora Civic Map"
+          }
+        </p>
         <p className="max-w-md text-sm text-muted-foreground">
           Set{" "}
           <code className="rounded bg-muted px-1 py-0.5">
@@ -99,6 +105,7 @@ export function CivicMap({ markers }: CivicMapProps) {
 /** Inner surface — needs to be inside APIProvider to use the map instance. */
 function MapSurface({ markers }: CivicMapProps) {
   const map = useMap();
+  const t = useT();
   const [zoom, setZoom] = useState<number>(INDIA_MAP_CONFIG.zoom);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Set<StatusGroup>>(
@@ -139,7 +146,7 @@ function MapSurface({ markers }: CivicMapProps) {
     <div
       className="relative h-full w-full overflow-hidden rounded-xl border"
       role="region"
-      aria-label="Interactive civic issues map of India"
+      aria-label={t("map.ariaLabel")}
     >
       <Map
         defaultCenter={INDIA_MAP_CONFIG.center}
@@ -206,7 +213,7 @@ function MapSurface({ markers }: CivicMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-3 left-3 z-10">
+      <div className={cn("absolute bottom-3 left-3 z-10", selected && "hidden sm:block")}>
         <MapLegend />
       </div>
 
@@ -216,13 +223,15 @@ function MapSurface({ markers }: CivicMapProps) {
           <div className="animate-fade-in-up rounded-xl border border-border/70 bg-card p-4 shadow-elev-3">
             <div className="flex items-start justify-between gap-2">
               <p className="flex items-center gap-1.5 font-semibold">
-                <span>{CATEGORY_META[selected.category].glyph}</span>
-                {CATEGORY_META[selected.category].label}
+                <span aria-hidden="true">
+                  {CATEGORY_META[selected.category].glyph}
+                </span>
+                {t(`categories.${selected.category}`)}
               </p>
               <button
                 type="button"
                 onClick={() => setSelectedId(null)}
-                aria-label="Close preview"
+                aria-label={t("map.closePreview")}
                 className="ring-focus rounded-md p-0.5 text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
@@ -236,20 +245,24 @@ function MapSurface({ markers }: CivicMapProps) {
                     GROUP_DOT[STATUS_META[selected.status].group],
                   )}
                 />
-                {STATUS_META[selected.status].label}
+                {t(`statuses.${selected.status}`)}
               </span>
               {selected.reportCount > 1 && (
-                <span>{selected.reportCount} reports</span>
+                <span>
+                  {t("caseCard.reportOther", { n: selected.reportCount })}
+                </span>
               )}
               {selected.severityLabel && (
-                <span className="capitalize">
-                  {selected.severityLabel} severity
+                <span>
+                  {t("map.severityBadge", {
+                    level: t(`severity.${selected.severityLabel}`),
+                  })}
                 </span>
               )}
             </div>
             {selected.locality && (
               <p className="mt-1 text-xs text-muted-foreground">
-                📍 {selected.locality}
+                <span aria-hidden="true">📍</span> {selected.locality}
               </p>
             )}
             {selected.href && (
@@ -257,7 +270,7 @@ function MapSurface({ markers }: CivicMapProps) {
                 href={selected.href}
                 className="ring-focus mt-3 inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                View civic case
+                {t("map.viewCase")}
               </Link>
             )}
           </div>

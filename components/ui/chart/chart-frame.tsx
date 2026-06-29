@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { getServerT } from "@/lib/i18n/server";
 
 /**
  * Velora 3.0 — Chart frame (Phase 2B, CH1/XC5).
@@ -38,6 +39,7 @@ export function ChartFrame({
   className,
   children,
 }: ChartFrameProps) {
+  const t = getServerT();
   return (
     <figure className={cn("space-y-3", className)}>
       {(title || description) && (
@@ -61,7 +63,7 @@ export function ChartFrame({
           <caption>{ariaLabel}</caption>
           <thead>
             <tr>
-              <th scope="col">Category</th>
+              <th scope="col">{t("chart.category")}</th>
               <th scope="col">{valueLabel}</th>
             </tr>
           </thead>

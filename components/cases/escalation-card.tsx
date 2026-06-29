@@ -6,6 +6,7 @@ import { Megaphone, Copy, Check, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useT } from "@/lib/i18n/provider";
 import type { EscalationDraft } from "@/lib/escalation";
 
 /**
@@ -13,6 +14,7 @@ import type { EscalationDraft } from "@/lib/escalation";
  * to the recommended department; the citizen can copy it or open it in email.
  */
 export function EscalationCard({ draft }: { draft: EscalationDraft }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -33,9 +35,11 @@ export function EscalationCard({ draft }: { draft: EscalationDraft }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-1.5 text-base">
             <Megaphone className="h-4 w-4" />
-            One-tap escalation
+            {t("escalation.title")}
           </CardTitle>
-          <Badge variant="secondary">To: {draft.department}</Badge>
+          <Badge variant="secondary">
+            {t("escalation.to", { department: draft.department })}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -46,23 +50,23 @@ export function EscalationCard({ draft }: { draft: EscalationDraft }) {
           <Button type="button" size="sm" onClick={copy}>
             {copied ? (
               <>
-                <Check className="mr-1.5 h-4 w-4" /> Copied
+                <Check className="mr-1.5 h-4 w-4" /> {t("escalation.copied")}
               </>
             ) : (
               <>
-                <Copy className="mr-1.5 h-4 w-4" /> Copy complaint
+                <Copy className="mr-1.5 h-4 w-4" />{" "}
+                {t("escalation.copyComplaint")}
               </>
             )}
           </Button>
           <Button asChild size="sm" variant="outline">
             <a href={mailto}>
-              <Mail className="mr-1.5 h-4 w-4" /> Open in email
+              <Mail className="mr-1.5 h-4 w-4" /> {t("escalation.openInEmail")}
             </a>
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Draft assembled deterministically from this case&apos;s facts — no
-          AI-invented details.
+          {t("escalation.disclaimer")}
         </p>
       </CardContent>
     </Card>

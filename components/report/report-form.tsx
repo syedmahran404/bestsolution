@@ -40,6 +40,9 @@ const DRAFT_KEY = "velora.report.draft";
 export function ReportForm() {
   const router = useRouter();
   const t = useT();
+  // Pre-split so the env-var token keeps its <code> styling while the
+  // surrounding copy is fully localized via a single {code} placeholder key.
+  const firebaseHintParts = t("report.firebaseHint").split("{code}");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -198,9 +201,10 @@ export function ReportForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {!isFirebaseClientConfigured && (
-        <InfoBanner tone="warning" title="Firebase is not configured yet">
-          Set the <code>NEXT_PUBLIC_FIREBASE_*</code> environment variables to
-          enable media uploads and submission.
+        <InfoBanner tone="warning" title={t("report.firebaseNotConfigured")}>
+          {firebaseHintParts[0]}
+          <code>NEXT_PUBLIC_FIREBASE_*</code>
+          {firebaseHintParts[1]}
         </InfoBanner>
       )}
 
@@ -233,7 +237,7 @@ export function ReportForm() {
           </Label>
           <Input
             id="title"
-            placeholder="e.g. Fallen tree blocking the footpath"
+            placeholder={t("report.titlePlaceholder")}
             {...register("title")}
           />
           {errors.title && (
@@ -275,7 +279,7 @@ export function ReportForm() {
         <Textarea
           id="description"
           rows={3}
-          placeholder="Anything else that helps — when you noticed it, safety concerns…"
+          placeholder={t("report.detailsPlaceholder")}
           {...register("description")}
         />
         {errors.description && (
@@ -334,21 +338,18 @@ export function ReportForm() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Optional contact lets authorities follow up with you for details
-              or confirmation — it speeds up investigation. It is never shown
-              publicly.
+              {t("report.verifiedContactHint")}
             </p>
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Anonymous reports never collect personal data. You can still track
-            them on this device.
+            {t("report.anonymousHint")}
           </p>
         )}
       </div>
 
       {submitError && (
-        <InfoBanner tone="critical" title="Couldn't submit report">
+        <InfoBanner tone="critical" title={t("report.submitErrorTitle")}>
           {submitError}
         </InfoBanner>
       )}

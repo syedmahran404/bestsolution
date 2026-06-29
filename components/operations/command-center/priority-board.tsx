@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 import { PriorityBadge } from "@/components/brand";
 import { CATEGORY_META } from "@/lib/constants";
+import { getServerT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 import type { CivicCase, PriorityAssessment } from "@/types";
 
@@ -25,21 +26,22 @@ export function PriorityBoard({
 }: {
   ranked: { c: CivicCase; p: PriorityAssessment }[];
 }) {
+  const t = getServerT();
   return (
     <section
-      aria-label="Priority board"
+      aria-label={t("ops.priorityBoard")}
       className="rounded-xl border border-border/70 bg-card shadow-elev-1"
     >
       <header className="flex items-center justify-between border-b border-border/70 px-4 py-3">
-        <h2 className="text-h3">Priority board</h2>
+        <h2 className="text-h3">{t("ops.priorityBoard")}</h2>
         <span className="text-xs text-muted-foreground">
-          Deterministic ranking
+          {t("ops.deterministicRanking")}
         </span>
       </header>
 
       {ranked.length === 0 ? (
         <p className="px-4 py-6 text-sm text-muted-foreground">
-          No cases to prioritize yet.
+          {t("ops.noCasesToPrioritize")}
         </p>
       ) : (
         <ol className="divide-y divide-border/60">

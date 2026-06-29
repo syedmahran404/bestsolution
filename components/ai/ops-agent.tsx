@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThinkingDots } from "@/components/motion/thinking-dots";
+import { useT } from "@/lib/i18n/provider";
+import type { MessageKey } from "@/lib/i18n/messages";
 
 interface AgentStep {
   tool: string;
@@ -21,10 +23,10 @@ interface AgentResult {
   needsClarification: boolean;
 }
 
-const SUGGESTIONS = [
-  "What needs attention today?",
-  "Where are the worst hotspots?",
-  "How healthy is the city right now?",
+const SUGGESTION_KEYS: MessageKey[] = [
+  "opsAgent.suggestion1",
+  "opsAgent.suggestion2",
+  "opsAgent.suggestion3",
 ];
 
 /**
@@ -32,6 +34,7 @@ const SUGGESTIONS = [
  * answered by the tool-using agent, with visible tool-call reasoning steps.
  */
 export function OpsAgent() {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AgentResult | null>(null);
@@ -54,11 +57,13 @@ export function OpsAgent() {
         error?: string;
       };
       if (!res.ok || !data.result) {
-        throw new Error(data.error ?? "Agent request failed.");
+        throw new Error(data.error ?? t("opsAgent.requestFailed"));
       }
       setResult(data.result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(
+        err instanceof Error ? err.message : t("opsAgent.somethingWrong"),
+      );
     } finally {
       setLoading(false);
     }
@@ -69,7 +74,7 @@ export function OpsAgent() {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-1.5 text-base text-brand">
           <Sparkles className="h-4 w-4" />
-          Ask Velora
+          {t("opsAgent.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -83,8 +88,8 @@ export function OpsAgent() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about priorities, hotspots, city health…"
-            aria-label="Ask the operations agent"
+            placeholder={t("opsAgent.placeholder")}
+            aria-label={t("opsAgent.inputLabel")}
           />
           <Button type="submit" disabled={loading}>
             {loading ? (
@@ -96,17 +101,17 @@ export function OpsAgent() {
         </form>
 
         <div className="flex flex-wrap gap-1.5">
-          {SUGGESTIONS.map((s) => (
+          {SUGGESTION_KEYS.map((key) => (
             <button
-              key={s}
+              key={key}
               type="button"
               onClick={() => {
-                setQuery(s);
-                ask(s);
+                setQuery(t(key));
+                ask(t(key));
               }}
               className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              {s}
+              {t(key)}
             </button>
           ))}
         </div>
@@ -118,7 +123,7 @@ export function OpsAgent() {
           <div className="animate-fade-in space-y-2 rounded-md border border-brand/20 bg-brand/5 p-3">
             <p className="flex items-center gap-2 text-sm font-medium text-brand">
               <Sparkles className="h-4 w-4 animate-pulse" />
-              Velora is analyzing
+              {t("opsAgent.analyzing")}
               <ThinkingDots />
             </p>
             <div className="space-y-1.5">
@@ -135,8 +140,11 @@ export function OpsAgent() {
               <div className="space-y-1 rounded-md border bg-muted/40 p-3">
                 <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <Terminal className="h-3.5 w-3.5" />
-                  Reasoning ({result.usedTools.length} tool
-                  {result.usedTools.length === 1 ? "" : "s"} used)
+                  {result.usedTools.length === 1
+                    ? t("opsAgent.reasoningOne", { n: result.usedTools.length })
+                    : t("opsAgent.reasoningOther", {
+                        n: result.usedTools.length,
+                      })}
                 </p>
                 <ol className="space-y-1">
                   {result.steps.map((s, i) => (
@@ -158,10 +166,14 @@ export function OpsAgent() {
                   <Sparkles className="h-4 w-4 text-brand" />
                 )}
                 <Badge variant="secondary">
-                  {result.generatedBy === "ai" ? "AI + tools" : "Deterministic"}
+                  {result.generatedBy === "ai"
+                    ? t("opsAgent.aiTools")
+                    : t("opsAgent.deterministic")}
                 </Badge>
                 {result.needsClarification && (
-                  <Badge variant="secondary">Needs clarification</Badge>
+                  <Badge variant="secondary">
+                    {t("opsAgent.needsClarification")}
+                  </Badge>
                 )}
               </div>
               <p className="text-sm text-foreground">

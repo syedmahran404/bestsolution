@@ -1,7 +1,10 @@
+"use client";
+
 import { Sparkles, Quote } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { CATEGORY_META } from "@/lib/constants";
+import { useT } from "@/lib/i18n/provider";
 import type { AIAnalysis, IssueCategory } from "@/types";
 
 interface AIReasoningPanelProps {
@@ -20,6 +23,7 @@ export function AIReasoningPanel({
   analysis,
   userCategory,
 }: AIReasoningPanelProps) {
+  const t = useT();
   if (!analysis) return null;
 
   const aiCat = CATEGORY_META[analysis.category];
@@ -31,30 +35,35 @@ export function AIReasoningPanel({
       <div className="mb-1.5 flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 font-semibold text-brand">
           <Sparkles className="h-4 w-4" />
-          AI Analysis
+          {t("aiPanel.analysis")}
         </span>
-        <Badge variant="secondary">{confidencePct}% confidence</Badge>
+        <Badge variant="secondary">
+          {t("aiPanel.confidence", { pct: confidencePct })}
+        </Badge>
       </div>
 
       <div className="space-y-1.5 text-foreground">
         <p>
-          <span className="font-medium">Category:</span> {aiCat.glyph}{" "}
-          {aiCat.label}
+          <span className="font-medium">{t("aiPanel.category")}</span>{" "}
+          {aiCat.glyph} {t(`categories.${analysis.category}`)}
           {disagrees && (
             <span className="text-xs text-muted-foreground">
               {" "}
-              (citizen selected {CATEGORY_META[userCategory].label})
+              {t("aiPanel.citizenSelected", {
+                category: t(`categories.${userCategory}`),
+              })}
             </span>
           )}
         </p>
 
         <p>
-          <span className="font-medium">Reasoning:</span> {analysis.reasoning}
+          <span className="font-medium">{t("aiPanel.reasoning")}</span>{" "}
+          {analysis.reasoning}
         </p>
 
         {analysis.keywords.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="font-medium">Detected:</span>
+            <span className="font-medium">{t("aiPanel.detected")}</span>
             {analysis.keywords.map((k) => (
               <Badge key={k} variant="outline" className="font-normal">
                 {k}
@@ -69,7 +78,9 @@ export function AIReasoningPanel({
           <div className="mt-1 flex gap-1.5 rounded bg-card/70 p-2 text-xs text-muted-foreground ring-1 ring-border/60">
             <Quote className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>
-              <span className="font-medium">Voice transcript:</span>{" "}
+              <span className="font-medium">
+                {t("aiPanel.voiceTranscript")}
+              </span>{" "}
               {analysis.transcript}
             </span>
           </div>

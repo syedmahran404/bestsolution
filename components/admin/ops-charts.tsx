@@ -6,6 +6,7 @@ import {
   categoryBarData,
 } from "@/components/ui/chart";
 import { dailyActivity, severityMix, statusMix } from "@/lib/chart-data";
+import { getServerT } from "@/lib/i18n/server";
 import type { OperationsMetrics } from "@/lib/insights";
 import type { CivicCase } from "@/types";
 
@@ -21,6 +22,7 @@ export function OpsCharts({
   cases: CivicCase[];
   metrics: OperationsMetrics;
 }) {
+  const t = getServerT();
   const status = statusMix(cases);
   const severity = severityMix(cases);
   const activity = dailyActivity(cases, 7);
@@ -30,48 +32,50 @@ export function OpsCharts({
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Case status mix</CardTitle>
+          <CardTitle className="text-base">{t("charts.statusMix")}</CardTitle>
         </CardHeader>
         <CardContent>
           <DonutChart
-            ariaLabel="Civic cases by lifecycle status"
+            ariaLabel={t("charts.casesByStatusAria")}
             data={status}
-            valueLabel="Cases"
-            centerLabel="cases"
+            valueLabel={t("charts.valueCases")}
+            centerLabel={t("charts.centerCases")}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Severity distribution</CardTitle>
+          <CardTitle className="text-base">
+            {t("charts.severityDistribution")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <DonutChart
-            ariaLabel="Civic cases by severity band"
+            ariaLabel={t("charts.casesBySeverityAria")}
             data={severity}
-            valueLabel="Cases"
-            centerLabel="rated"
+            valueLabel={t("charts.valueCases")}
+            centerLabel={t("charts.centerRated")}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Activity (7 days)</CardTitle>
+          <CardTitle className="text-base">{t("charts.activity7d")}</CardTitle>
         </CardHeader>
         <CardContent>
           <TrendChart
-            ariaLabel="Reports created versus cases resolved over the last seven days"
+            ariaLabel={t("charts.activityAria")}
             labels={activity.labels}
             series={[
               {
-                name: "Created",
+                name: t("charts.seriesCreated"),
                 points: activity.created,
                 color: "hsl(var(--brand))",
               },
               {
-                name: "Resolved",
+                name: t("charts.seriesResolved"),
                 points: activity.resolved,
                 color: "hsl(var(--success))",
               },
@@ -83,14 +87,16 @@ export function OpsCharts({
       {catData.length > 0 && (
         <Card className="lg:col-span-3">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Reports by category</CardTitle>
+            <CardTitle className="text-base">
+              {t("charts.reportsByCategory")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <BarChart
-              ariaLabel="Total reports per civic category"
+              ariaLabel={t("charts.reportsByCategoryAria")}
               data={catData}
               glyphs={glyphs}
-              valueLabel="Reports"
+              valueLabel={t("charts.valueReports")}
             />
           </CardContent>
         </Card>

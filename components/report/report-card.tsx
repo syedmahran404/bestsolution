@@ -3,21 +3,12 @@ import { MapPin, Mic, Clock } from "lucide-react";
 import { StatusBadge, PriorityBadge } from "@/components/brand";
 import { Card } from "@/components/ui/card";
 import { CATEGORY_META } from "@/lib/constants";
+import { useFormatters } from "@/lib/i18n/provider";
 import type { CivicReport } from "@/types";
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString("en-IN", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-  } catch {
-    return iso;
-  }
-}
 
 /** A single submitted report in the "My Reports" list. */
 export function ReportCard({ report }: { report: CivicReport }) {
+  const { formatDate } = useFormatters();
   const category = CATEGORY_META[report.category];
 
   return (

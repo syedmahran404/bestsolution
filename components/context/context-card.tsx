@@ -2,6 +2,8 @@ import { MapPin, Landmark, ShieldAlert, Info } from "lucide-react";
 
 import { PriorityBadge } from "@/components/brand";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getServerT } from "@/lib/i18n/server";
+import type { MessageKey } from "@/lib/i18n/messages";
 import type { ContextFactor, SeverityLabel } from "@/types";
 
 interface ContextCardProps {
@@ -31,6 +33,7 @@ export function ContextCard({
   severityReasons = [],
   source,
 }: ContextCardProps) {
+  const t = getServerT();
   const hasAnything =
     locality || district || state || factors.length > 0 || severityLabel;
   if (!hasAnything) return null;
@@ -44,11 +47,11 @@ export function ContextCard({
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-1.5 text-base">
             <MapPin className="h-4 w-4" />
-            Civic context
+            {t("context.title")}
           </CardTitle>
           {severityLabel && (
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              Severity
+              {t("context.severity")}
               <PriorityBadge severity={severityLabel} />
               {typeof severityScore === "number" ? `(${severityScore})` : ""}
             </span>
@@ -59,7 +62,7 @@ export function ContextCard({
       <CardContent className="space-y-4 text-sm">
         {areaLine && (
           <div>
-            <p className="text-xs text-muted-foreground">Area</p>
+            <p className="text-xs text-muted-foreground">{t("context.area")}</p>
             <p className="font-medium">{areaLine}</p>
           </div>
         )}
@@ -68,7 +71,7 @@ export function ContextCard({
           <div className="space-y-1.5">
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Landmark className="h-3.5 w-3.5" />
-              Nearby places that increase impact
+              {t("context.nearbyPlaces")}
             </p>
             <ul className="space-y-1">
               {factors.map((f) => (
@@ -77,11 +80,11 @@ export function ContextCard({
                   className="flex items-center justify-between gap-2"
                 >
                   <span className="capitalize">
-                    {f.type} ·{" "}
+                    {t(`contextType.${f.type}` as MessageKey)} ·{" "}
                     <span className="text-muted-foreground">{f.name}</span>
                   </span>
                   <span className="text-xs text-muted-foreground tabular-nums">
-                    {f.distanceM}m
+                    {t("context.distanceM", { n: f.distanceM })}
                   </span>
                 </li>
               ))}
@@ -93,7 +96,7 @@ export function ContextCard({
           <div className="space-y-1.5">
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldAlert className="h-3.5 w-3.5" />
-              Why this severity
+              {t("context.whySeverity")}
             </p>
             <ul className="space-y-0.5 text-xs text-muted-foreground">
               {severityReasons.map((r, i) => (
@@ -106,7 +109,7 @@ export function ContextCard({
         {source && (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Info className="h-3.5 w-3.5" />
-            Source: {source}
+            {t("context.source", { source })}
           </p>
         )}
       </CardContent>

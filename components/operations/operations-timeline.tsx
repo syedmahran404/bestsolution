@@ -1,5 +1,6 @@
 import { User, Cpu, Sparkles, ShieldCheck } from "lucide-react";
 
+import { getServerT } from "@/lib/i18n/server";
 import type { TimelineEvent } from "@/types";
 
 const SOURCE_META: Record<
@@ -25,9 +26,10 @@ function fmt(iso: string): string {
 
 /** Chronological operations timeline (U3). Deterministic — built from case data. */
 export function OperationsTimeline({ events }: { events: TimelineEvent[] }) {
+  const t = getServerT();
   if (events.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">No timeline events yet.</p>
+      <p className="text-sm text-muted-foreground">{t("timeline.noEvents")}</p>
     );
   }
 

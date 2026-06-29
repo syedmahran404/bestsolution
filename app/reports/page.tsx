@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { MyReportsList } from "@/components/report/my-reports-list";
 import { ReportSubmitted } from "@/components/report/report-submitted";
 import { Button } from "@/components/ui/button";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default function ReportsPage({
 }: {
   searchParams?: { submitted?: string; count?: string };
 }) {
+  const t = getServerT();
   const justSubmitted = searchParams?.submitted === "1";
   const voiceCount = Number(searchParams?.count ?? "1");
 
@@ -35,15 +37,15 @@ export default function ReportsPage({
 
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="space-y-1">
-            <h1 className="text-h1">My Reports</h1>
+            <h1 className="text-h1">{t("reports.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Civic issues you submitted from this device.
+              {t("reports.subtitle")}
             </p>
           </div>
           <Button asChild>
             <Link href="/report">
               <FilePlus2 className="mr-2 h-4 w-4" />
-              New report
+              {t("reports.new")}
             </Link>
           </Button>
         </div>

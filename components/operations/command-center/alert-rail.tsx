@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 
 import { CATEGORY_META } from "@/lib/constants";
+import { formatNumber } from "@/lib/i18n/format";
+import { getServerLocale, getServerT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 import type { OperationsMetrics } from "@/lib/insights";
 import type { CivicCase } from "@/types";
@@ -41,6 +43,8 @@ export function AlertRail({
   metrics: OperationsMetrics;
   criticalCases: CivicCase[];
 }) {
+  const locale = getServerLocale();
+  const t = getServerT();
   const stats: AlertStat[] = [
     {
       icon: Clock,
@@ -70,7 +74,7 @@ export function AlertRail({
 
   return (
     <section
-      aria-label="Alerts"
+      aria-label={t("ops.alerts")}
       className="rounded-xl border border-border/70 bg-card shadow-elev-1"
     >
       <header className="flex items-center gap-2 border-b border-border/70 px-4 py-3">
@@ -78,7 +82,7 @@ export function AlertRail({
           <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-critical opacity-70" />
           <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-critical" />
         </span>
-        <h2 className="text-h3">Alerts</h2>
+        <h2 className="text-h3">{t("ops.alerts")}</h2>
       </header>
 
       <div className="grid grid-cols-2 gap-px bg-border/60">
@@ -93,7 +97,9 @@ export function AlertRail({
               >
                 <s.icon className="h-3.5 w-3.5" />
               </span>
-              <span className="text-metric !text-2xl">{s.value}</span>
+              <span className="text-metric !text-2xl">
+                {formatNumber(s.value, locale)}
+              </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
           </div>
@@ -102,11 +108,11 @@ export function AlertRail({
 
       <div className="space-y-1 p-2">
         <p className="px-2 pt-1 text-xs font-medium text-muted-foreground">
-          Needs attention
+          {t("ops.needsAttention")}
         </p>
         {criticalCases.length === 0 ? (
           <p className="px-2 py-3 text-sm text-muted-foreground">
-            Nothing critical right now.
+            {t("ops.nothingCritical")}
           </p>
         ) : (
           criticalCases.map((c) => (
@@ -128,7 +134,7 @@ export function AlertRail({
                 {c.locality ? ` · ${c.locality}` : ""}
               </span>
               <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                {c.reportCount}×
+                {formatNumber(c.reportCount, locale)}×
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </Link>

@@ -6,6 +6,7 @@ import { CivicCaseCard } from "@/components/cases/civic-case-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, STATUS_META, WORKFLOW_STATUSES } from "@/lib/constants";
+import { useT, useFormatters } from "@/lib/i18n/provider";
 import { REPORT_CATEGORIES } from "@/lib/validation/report";
 import type { CivicCase } from "@/types";
 
@@ -20,6 +21,8 @@ const SEVERITY_OPTIONS = ["low", "medium", "high", "critical"] as const;
  * Deterministic — no API calls.
  */
 export function CaseFilters({ cases }: { cases: CivicCase[] }) {
+  const t = useT();
+  const { formatNumber } = useFormatters();
   const [category, setCategory] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [severity, setSeverity] = useState<string>("all");
@@ -50,7 +53,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             htmlFor="filter-category"
             className="text-xs text-muted-foreground"
           >
-            Category
+            {t("filters.category")}
           </Label>
           <select
             id="filter-category"
@@ -58,7 +61,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option value="all">All categories</option>
+            <option value="all">{t("filters.allCategories")}</option>
             {REPORT_CATEGORIES.map((c) => (
               <option key={c} value={c}>
                 {CATEGORY_META[c].label}
@@ -72,7 +75,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             htmlFor="filter-status"
             className="text-xs text-muted-foreground"
           >
-            Status
+            {t("filters.status")}
           </Label>
           <select
             id="filter-status"
@@ -80,7 +83,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
-            <option value="all">All statuses</option>
+            <option value="all">{t("filters.allStatuses")}</option>
             {WORKFLOW_STATUSES.map((s) => (
               <option key={s} value={s}>
                 {STATUS_META[s].label}
@@ -91,7 +94,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
 
         <div className="space-y-1">
           <Label htmlFor="filter-min" className="text-xs text-muted-foreground">
-            Min reports
+            {t("filters.minReports")}
           </Label>
           <Input
             id="filter-min"
@@ -108,7 +111,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             htmlFor="filter-severity"
             className="text-xs text-muted-foreground"
           >
-            Severity
+            {t("filters.severity")}
           </Label>
           <select
             id="filter-severity"
@@ -116,10 +119,10 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
           >
-            <option value="all">All severities</option>
+            <option value="all">{t("filters.allSeverities")}</option>
             {SEVERITY_OPTIONS.map((s) => (
               <option key={s} value={s}>
-                {s.charAt(0).toUpperCase() + s.slice(1)}
+                {t(`severity.${s}`)}
               </option>
             ))}
           </select>
@@ -130,12 +133,12 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             htmlFor="filter-locality"
             className="text-xs text-muted-foreground"
           >
-            Locality
+            {t("filters.locality")}
           </Label>
           <Input
             id="filter-locality"
             type="text"
-            placeholder="e.g. Koramangala"
+            placeholder={t("filters.localityPlaceholder")}
             value={locality}
             onChange={(e) => setLocality(e.target.value)}
           />
@@ -146,7 +149,7 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
             htmlFor="filter-from"
             className="text-xs text-muted-foreground"
           >
-            From date
+            {t("filters.fromDate")}
           </Label>
           <Input
             id="filter-from"
@@ -158,12 +161,14 @@ export function CaseFilters({ cases }: { cases: CivicCase[] }) {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {filtered.length} case{filtered.length === 1 ? "" : "s"}
+        {filtered.length === 1
+          ? t("filters.countOne", { n: formatNumber(filtered.length) })
+          : t("filters.countOther", { n: formatNumber(filtered.length) })}
       </p>
 
       {filtered.length === 0 ? (
         <p className="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground">
-          No cases match the current filters.
+          {t("filters.none")}
         </p>
       ) : (
         <div className="space-y-3">

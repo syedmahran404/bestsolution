@@ -2,6 +2,7 @@ import { Scale } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrustBadges } from "@/components/trust/trust-badges";
+import { getServerT } from "@/lib/i18n/server";
 import type { HealthFactor, PriorityAssessment, Recommendation } from "@/types";
 
 /**
@@ -16,6 +17,7 @@ export function TransparencyPanel({
   priority: PriorityAssessment;
   recommendation: Recommendation;
 }) {
+  const t = getServerT();
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -36,11 +38,17 @@ export function TransparencyPanel({
           <table className="w-full text-left text-xs">
             <thead className="bg-muted/50 text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 font-medium">Input</th>
-                <th className="px-3 py-2 font-medium">Value</th>
-                <th className="px-3 py-2 font-medium">Weight</th>
+                <th className="px-3 py-2 font-medium">
+                  {t("transparency.input")}
+                </th>
+                <th className="px-3 py-2 font-medium">
+                  {t("transparency.value")}
+                </th>
+                <th className="px-3 py-2 font-medium">
+                  {t("transparency.weight")}
+                </th>
                 <th className="px-3 py-2 text-right font-medium">
-                  Contribution
+                  {t("transparency.contribution")}
                 </th>
               </tr>
             </thead>
@@ -58,7 +66,7 @@ export function TransparencyPanel({
               ))}
               <tr className="border-t bg-muted/30 font-semibold">
                 <td className="px-3 py-2" colSpan={3}>
-                  Priority score
+                  {t("transparency.priorityScore")}
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums">
                   {priority.score}
@@ -69,7 +77,9 @@ export function TransparencyPanel({
         </div>
 
         <div>
-          <p className="text-xs font-medium text-muted-foreground">Decision</p>
+          <p className="text-xs font-medium text-muted-foreground">
+            {t("transparency.decision")}
+          </p>
           <p className="font-medium">{recommendation.label}</p>
           <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
             {recommendation.reasoning.map((r, i) => (

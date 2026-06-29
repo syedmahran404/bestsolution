@@ -1,6 +1,7 @@
 "use client";
 
 import { CATEGORY_META } from "@/lib/constants";
+import { useT } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { IssueCategory } from "@/types";
 
@@ -11,10 +12,14 @@ import type { IssueCategory } from "@/types";
  */
 export type StatusGroup = "open" | "progress" | "resolved";
 
-const STATUS_CHIPS: { group: StatusGroup; label: string; dot: string }[] = [
-  { group: "open", label: "Open", dot: "bg-status-open" },
-  { group: "progress", label: "In progress", dot: "bg-status-progress" },
-  { group: "resolved", label: "Resolved", dot: "bg-status-resolved" },
+const STATUS_CHIPS: {
+  group: StatusGroup;
+  labelKey: "map.open" | "map.inProgress" | "map.resolved";
+  dot: string;
+}[] = [
+  { group: "open", labelKey: "map.open", dot: "bg-status-open" },
+  { group: "progress", labelKey: "map.inProgress", dot: "bg-status-progress" },
+  { group: "resolved", labelKey: "map.resolved", dot: "bg-status-resolved" },
 ];
 
 const CATEGORIES = Object.keys(CATEGORY_META) as IssueCategory[];
@@ -32,6 +37,7 @@ export function MapFilters({
   onToggleStatus,
   onToggleCategory,
 }: MapFiltersProps) {
+  const t = useT();
   return (
     <div className="pointer-events-auto flex max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl border border-border/70 bg-background/85 p-2 shadow-elev-2 backdrop-blur-md">
       <div className="flex flex-wrap items-center gap-1.5">
@@ -51,7 +57,7 @@ export function MapFilters({
               )}
             >
               <span className={cn("h-1.5 w-1.5 rounded-full", s.dot)} />
-              {s.label}
+              {t(s.labelKey)}
             </button>
           );
         })}
@@ -65,7 +71,7 @@ export function MapFilters({
               type="button"
               aria-pressed={active}
               onClick={() => onToggleCategory(c)}
-              title={CATEGORY_META[c].label}
+              title={t(`categories.${c}`)}
               className={cn(
                 "ring-focus inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs transition-colors",
                 active
@@ -74,7 +80,9 @@ export function MapFilters({
               )}
             >
               <span aria-hidden>{CATEGORY_META[c].glyph}</span>
-              <span className="hidden sm:inline">{CATEGORY_META[c].label}</span>
+              <span className="hidden sm:inline">
+                {t(`categories.${c}`)}
+              </span>
             </button>
           );
         })}

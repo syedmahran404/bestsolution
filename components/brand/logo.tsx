@@ -52,7 +52,13 @@ export function Wordmark({ className }: { className?: string }) {
         className,
       )}
     >
-      Velora <span className="text-gradient-brand">Civic AI</span>
+      Velora{" "}
+      <span className="text-gradient-brand">
+        {
+          // i18n-exempt — brand wordmark
+          "Civic AI"
+        }
+      </span>
     </span>
   );
 }
@@ -73,7 +79,10 @@ export function Logo({
         <Wordmark />
         {showTagline && (
           <span className="block text-xs text-muted-foreground">
-            AI Civic Operations Center
+            {
+              // i18n-exempt — brand tagline (logo lockup)
+              "AI Civic Operations Center"
+            }
           </span>
         )}
       </span>

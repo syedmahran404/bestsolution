@@ -2,6 +2,7 @@ import { TrendingUp, MapPin, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { TrustBadges } from "@/components/trust/trust-badges";
+import { getServerT } from "@/lib/i18n/server";
 import type { CivicInsight } from "@/types";
 
 const KIND_ICON = {
@@ -13,6 +14,7 @@ const KIND_ICON = {
 
 /** Explainable civic insight card (U4) — shows why + how + confidence. */
 export function InsightCard({ insight }: { insight: CivicInsight }) {
+  const t = getServerT();
   const Icon = KIND_ICON[insight.kind];
   return (
     <Card>
@@ -25,7 +27,9 @@ export function InsightCard({ insight }: { insight: CivicInsight }) {
         </div>
         <p className="text-sm text-muted-foreground">{insight.why}</p>
         <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">How:</span>{" "}
+          <span className="font-medium text-foreground">
+            {t("insight.how")}
+          </span>{" "}
           {insight.how}
         </p>
         <TrustBadges mode="deterministic" confidence={insight.confidence} />

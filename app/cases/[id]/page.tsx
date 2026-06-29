@@ -24,6 +24,8 @@ import {
   STATUS_META,
 } from "@/lib/constants";
 import { getCivicCase, getReportsForCase } from "@/lib/civic-cases";
+import { getServerLocale, getServerT } from "@/lib/i18n/server";
+import { formatDate, formatNumber } from "@/lib/i18n/format";
 import { getOrGenerateCaseIntelligence } from "@/lib/ai/case-intelligence";
 import { getOrGenerateOperationsBrief } from "@/lib/ai/operations-brief";
 import {
@@ -52,14 +54,16 @@ export default async function CaseDetailPage({
 }: {
   params: { id: string };
 }) {
+  const t = getServerT();
+  const locale = getServerLocale();
+
   if (!isFirebaseAdminConfigured) {
     return (
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="container max-w-3xl flex-1 py-10 text-center">
           <p className="text-sm text-muted-foreground">
-            Backend not configured. Set FIREBASE_SERVICE_ACCOUNT_KEY to view
-            civic cases.
+            {t("caseDetail.backendNotConfigured")}
           </p>
         </main>
       </div>
@@ -133,7 +137,7 @@ export default async function CaseDetailPage({
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to map
+          {t("caseDetail.backToMap")}
         </Link>
 
         {/* Case summary */}
@@ -150,13 +154,18 @@ export default async function CaseDetailPage({
               </div>
               <div className="space-y-1">
                 <CardTitle className="text-xl">
-                  {category.glyph} {category.label} case
+                  {category.glyph}{" "}
+                  {t("caseDetail.caseTitle", {
+                    category: t(`categories.${civicCase.category}`),
+                  })}
                 </CardTitle>
                 <div className="flex flex-wrap items-center gap-2">
                   {civicCase.reportCount > 1 && (
                     <Badge variant="secondary" className="gap-1">
                       <Layers className="h-3 w-3" />
-                      Aggregated · {civicCase.reportCount} reports
+                      {t("caseDetail.aggregatedReports", {
+                        n: formatNumber(civicCase.reportCount, locale),
+                      })}
                     </Badge>
                   )}
                   <StatusBadge status={civicCase.status} />
@@ -165,20 +174,33 @@ export default async function CaseDetailPage({
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
-            <Metric label="Reports" value={String(civicCase.reportCount)} />
-            <Metric label="Category" value={category.label} />
-            <Metric label="Status" value={status.label} />
             <Metric
-              label="Center"
+              label={t("caseDetail.metricReports")}
+              value={formatNumber(civicCase.reportCount, locale)}
+            />
+            <Metric
+              label={t("caseDetail.metricCategory")}
+              value={t(`categories.${civicCase.category}`)}
+            />
+            <Metric
+              label={t("caseDetail.metricStatus")}
+              value={t(`statuses.${civicCase.status}`)}
+            />
+            <Metric
+              label={t("caseDetail.metricCenter")}
               value={`${civicCase.centerLocation.lat.toFixed(4)}, ${civicCase.centerLocation.lng.toFixed(4)}`}
             />
             <Metric
-              label="Created"
-              value={new Date(civicCase.createdAt).toLocaleDateString("en-IN")}
+              label={t("caseDetail.metricCreated")}
+              value={formatDate(civicCase.createdAt, locale, {
+                dateStyle: "medium",
+              })}
             />
             <Metric
-              label="Updated"
-              value={new Date(civicCase.updatedAt).toLocaleDateString("en-IN")}
+              label={t("caseDetail.metricUpdated")}
+              value={formatDate(civicCase.updatedAt, locale, {
+                dateStyle: "medium",
+              })}
             />
           </CardContent>
         </Card>
@@ -222,40 +244,40 @@ export default async function CaseDetailPage({
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-1.5 text-base">
               <Users className="h-4 w-4" />
-              Community impact (estimate)
+              {t("caseDetail.communityImpact")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <ImpactStat
                 icon={Users}
-                label="People affected"
-                value={`~${impact.people.toLocaleString()}`}
+                label={t("caseDetail.peopleAffected")}
+                value={`~${formatNumber(impact.people, locale)}`}
               />
               <ImpactStat
                 icon={School}
-                label="Schools nearby"
-                value={String(impact.schools)}
+                label={t("caseDetail.schoolsNearby")}
+                value={formatNumber(impact.schools, locale)}
               />
               <ImpactStat
                 icon={Building2}
-                label="Hospitals nearby"
-                value={String(impact.hospitals)}
+                label={t("caseDetail.hospitalsNearby")}
+                value={formatNumber(impact.hospitals, locale)}
               />
               <ImpactStat
                 icon={Bus}
-                label="Transit nearby"
-                value={String(impact.transit)}
+                label={t("caseDetail.transitNearby")}
+                value={formatNumber(impact.transit, locale)}
               />
               <ImpactStat
                 icon={Building2}
-                label="Businesses nearby"
-                value={String(impact.businesses)}
+                label={t("caseDetail.businessesNearby")}
+                value={formatNumber(impact.businesses, locale)}
               />
               <ImpactStat
                 icon={MapPinIcon}
-                label="Impact radius"
-                value={`${impact.radiusM} m`}
+                label={t("caseDetail.impactRadius")}
+                value={`${formatNumber(impact.radiusM, locale)} m`}
               />
             </div>
             <ul className="space-y-0.5 text-xs text-muted-foreground">
@@ -270,7 +292,9 @@ export default async function CaseDetailPage({
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Operations</CardTitle>
+              <CardTitle className="text-base">
+                {t("caseDetail.operations")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <StatusManager
@@ -279,7 +303,7 @@ export default async function CaseDetailPage({
               />
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Operations timeline
+                  {t("caseDetail.operationsTimeline")}
                 </p>
                 <OperationsTimeline events={timeline} />
               </div>
@@ -289,23 +313,26 @@ export default async function CaseDetailPage({
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">
-                Aggregation information
+                {t("caseDetail.aggregationInfo")}
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4 text-sm">
               <Metric
-                label="Reports aggregated"
-                value={String(civicCase.reportCount)}
+                label={t("caseDetail.reportsAggregated")}
+                value={formatNumber(civicCase.reportCount, locale)}
               />
               <Metric
-                label="Clustering radius"
-                value={`${AGGREGATION_RADIUS_M} m`}
+                label={t("caseDetail.clusteringRadius")}
+                value={`${formatNumber(AGGREGATION_RADIUS_M, locale)} m`}
               />
               <Metric
-                label="Centroid"
+                label={t("caseDetail.centroid")}
                 value={`${civicCase.centerLocation.lat.toFixed(4)}, ${civicCase.centerLocation.lng.toFixed(4)}`}
               />
-              <Metric label="Category" value={category.label} />
+              <Metric
+                label={t("caseDetail.metricCategory")}
+                value={t(`categories.${civicCase.category}`)}
+              />
               <div className="col-span-2 flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
                 <Layers className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>{linkage}</span>
@@ -321,7 +348,7 @@ export default async function CaseDetailPage({
         <section className="space-y-2">
           <h2 className="flex items-center gap-1.5 text-h3">
             <MapPin className="h-5 w-5 text-brand" />
-            Locations
+            {t("caseDetail.locations")}
           </h2>
           <div className="h-[40vh] min-h-[280px] w-full">
             <CivicMap markers={markers} />
@@ -330,11 +357,15 @@ export default async function CaseDetailPage({
 
         {/* Linked reports */}
         <section className="space-y-3">
-          <h2 className="text-h3">Linked reports ({reports.length})</h2>
+          <h2 className="text-h3">
+            {t("caseDetail.linkedReports", {
+              n: formatNumber(reports.length, locale),
+            })}
+          </h2>
 
           {reports.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No linked reports found.
+              {t("caseDetail.noLinkedReports")}
             </p>
           ) : (
             <div className="space-y-4">

@@ -9,11 +9,18 @@ import {
 } from "react";
 
 import { DEFAULT_LOCALE, LOCALE_COOKIE, type Locale } from "@/lib/i18n/locales";
-import { CATALOGS, en, type MessageKey } from "@/lib/i18n/messages";
+import { translate, type MessageKey } from "@/lib/i18n/messages";
+import {
+  formatDate,
+  formatNumber,
+  formatRelativeTime,
+} from "@/lib/i18n/format";
+
+type TVars = Record<string, string | number>;
 
 interface I18nContextValue {
   locale: Locale;
-  t: (key: MessageKey) => string;
+  t: (key: MessageKey, vars?: TVars) => string;
   setLocale: (l: Locale) => void;
 }
 
@@ -50,7 +57,7 @@ export function I18nProvider({
   }, []);
 
   const t = useCallback(
-    (key: MessageKey) => CATALOGS[locale]?.[key] ?? en[key] ?? key,
+    (key: MessageKey, vars?: TVars) => translate(locale, key, vars),
     [locale],
   );
 
@@ -68,7 +75,7 @@ export function useI18n(): I18nContextValue {
     // Fail open: usable even if a component renders outside the provider.
     return {
       locale: DEFAULT_LOCALE,
-      t: (key) => en[key] ?? key,
+      t: (key, vars) => translate(DEFAULT_LOCALE, key, vars),
       setLocale: () => {},
     };
   }
@@ -76,6 +83,17 @@ export function useI18n(): I18nContextValue {
 }
 
 /** Convenience translate hook. */
-export function useT(): (key: MessageKey) => string {
+export function useT(): (key: MessageKey, vars?: TVars) => string {
   return useI18n().t;
+}
+
+/** Locale-bound formatters (date / number / relative time). */
+export function useFormatters() {
+  const { locale } = useI18n();
+  return {
+    formatDate: (iso: string, opts?: Intl.DateTimeFormatOptions) =>
+      formatDate(iso, locale, opts),
+    formatNumber: (value: number) => formatNumber(value, locale),
+    formatRelativeTime: (iso: string) => formatRelativeTime(iso, locale),
+  };
 }

@@ -8,45 +8,49 @@ import {
 } from "lucide-react";
 
 import { MetricCard } from "@/components/brand";
+import { formatNumber } from "@/lib/i18n/format";
+import { getServerLocale, getServerT } from "@/lib/i18n/server";
 import type { OperationsMetrics } from "@/lib/insights";
 
 type Accent = "brand" | "info" | "warning" | "success" | "neutral";
 
 /** KPI cards for the Operations Center dashboard (Phase 5). */
 export function OpsMetrics({ metrics }: { metrics: OperationsMetrics }) {
+  const t = getServerT();
+  const locale = getServerLocale();
   const cards: {
     label: string;
-    value: number;
+    value: string;
     icon: LucideIcon;
     accent: Accent;
   }[] = [
     {
-      label: "Total Reports",
-      value: metrics.totalReports,
+      label: t("opsMetrics.totalReports"),
+      value: formatNumber(metrics.totalReports, locale),
       icon: FileText,
       accent: "brand",
     },
     {
-      label: "Civic Cases",
-      value: metrics.totalCases,
+      label: t("opsMetrics.civicCases"),
+      value: formatNumber(metrics.totalCases, locale),
       icon: Layers,
       accent: "info",
     },
     {
-      label: "Open Cases",
-      value: metrics.openCases,
+      label: t("opsMetrics.openCases"),
+      value: formatNumber(metrics.openCases, locale),
       icon: FolderOpen,
       accent: "warning",
     },
     {
-      label: "Resolved",
-      value: metrics.closedCases,
+      label: t("opsMetrics.resolved"),
+      value: formatNumber(metrics.closedCases, locale),
       icon: CheckCircle2,
       accent: "success",
     },
     {
-      label: "Active Clusters",
-      value: metrics.activeClusters.length,
+      label: t("opsMetrics.activeClusters"),
+      value: formatNumber(metrics.activeClusters.length, locale),
       icon: Activity,
       accent: "neutral",
     },

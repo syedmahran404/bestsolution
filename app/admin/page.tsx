@@ -22,6 +22,7 @@ import { computeCivicHealthOverview } from "@/lib/civic-health";
 import { computePriority } from "@/lib/operations";
 import { casesToMarkers } from "@/lib/map-markers";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
+import { getServerT } from "@/lib/i18n/server";
 import type { CivicCase } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,7 @@ export const metadata = { title: "Mission Control — Velora Civic AI" };
  * (alerts + AI dock). All numbers reuse lib/insights + lib/operations.
  */
 export default async function AdminPage() {
+  const t = getServerT();
   let cases: CivicCase[] = [];
   let loadError = false;
   if (isFirebaseAdminConfigured) {
@@ -70,16 +72,16 @@ export default async function AdminPage() {
         <div className="flex items-center justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wider text-brand">
-              Mission Control
+              {t("admin.kicker")}
             </p>
-            <h1 className="text-h1">Operations Center</h1>
+            <h1 className="text-h1">{t("admin.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Live civic intelligence — prioritize, monitor, and resolve.
+              {t("admin.subtitle")}
             </p>
           </div>
           <Button asChild>
             <Link href="/admin/cases">
-              Manage cases
+              {t("admin.manageCases")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -88,14 +90,14 @@ export default async function AdminPage() {
         {!isFirebaseAdminConfigured ? (
           <EmptyState
             illustration="offline"
-            title="Backend not configured"
-            description="Set FIREBASE_SERVICE_ACCOUNT_KEY to load operations data."
+            title={t("admin.notConfiguredTitle")}
+            description={t("admin.notConfiguredDesc")}
           />
         ) : loadError ? (
           <EmptyState
             illustration="error"
-            title="Couldn't load operations data"
-            description="Something went wrong fetching civic cases. Please try again later."
+            title={t("admin.loadErrorTitle")}
+            description={t("admin.loadErrorDesc")}
           />
         ) : (
           <>
@@ -123,12 +125,12 @@ export default async function AdminPage() {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base">
-                        Largest civic cases
+                        {t("admin.largestCases")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {metrics.largestCases.length === 0 ? (
-                        <EmptyHint />
+                        <EmptyHint text={t("admin.noData")} />
                       ) : (
                         metrics.largestCases.map((c) => (
                           <CivicCaseCard key={c.id} civicCase={c} />
@@ -140,12 +142,12 @@ export default async function AdminPage() {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base">
-                        Recent activity
+                        {t("admin.recentActivity")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {metrics.recentlyActive.length === 0 ? (
-                        <EmptyHint />
+                        <EmptyHint text={t("admin.noData")} />
                       ) : (
                         metrics.recentlyActive.map((c) => (
                           <CivicCaseCard key={c.id} civicCase={c} />

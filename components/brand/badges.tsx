@@ -1,4 +1,7 @@
+"use client";
+
 import { STATUS_META } from "@/lib/constants";
+import { useT } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { IssueStatus, SeverityLabel } from "@/types";
 
@@ -24,6 +27,7 @@ export function StatusBadge({
   status: IssueStatus;
   className?: string;
 }) {
+  const t = useT();
   const meta = STATUS_META[status];
   return (
     <span
@@ -36,7 +40,7 @@ export function StatusBadge({
         className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[meta.group])}
         aria-hidden
       />
-      {meta.label}
+      {t(`statuses.${status}`)}
     </span>
   );
 }
@@ -58,6 +62,7 @@ export function PriorityBadge({
   severity: SeverityLabel;
   className?: string;
 }) {
+  const t = useT();
   const meta = SEVERITY_META[severity];
 
   if (meta.solid) {
@@ -68,7 +73,7 @@ export function PriorityBadge({
           className,
         )}
       >
-        {meta.label}
+        {t(`severity.${severity}`)}
       </span>
     );
   }
@@ -81,7 +86,7 @@ export function PriorityBadge({
       )}
     >
       <span className={cn("h-1.5 w-1.5 rounded-full", meta.dot)} aria-hidden />
-      {meta.label}
+      {t(`severity.${severity}`)}
     </span>
   );
 }

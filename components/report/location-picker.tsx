@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useT } from "@/lib/i18n/provider";
 
 interface LocationValue {
   latitude: number | null;
@@ -41,6 +42,7 @@ export function LocationPicker({
   onChange,
   error,
 }: LocationPickerProps) {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [searching, setSearching] = useState(false);
@@ -149,7 +151,7 @@ export function LocationPicker({
 
   return (
     <div className="space-y-2">
-      <Label>Location</Label>
+      <Label>{t("report.location")}</Label>
 
       {/* Selected location card (address, never coordinates) */}
       {hasLocation ? (
@@ -161,7 +163,7 @@ export function LocationPicker({
                 {value.address ?? "Pinned location"}
               </p>
               <p className="text-xs text-muted-foreground">
-                Location captured. Authorities receive the precise point.
+                {t("report.locationCaptured")}
               </p>
             </div>
           </div>
@@ -183,9 +185,9 @@ export function LocationPicker({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search a place — e.g. Near KSRTC Bus Stand, Mysuru"
+              placeholder={t("report.locationSearchPlaceholder")}
               className="pl-9"
-              aria-label="Search for a location"
+              aria-label={t("report.locationSearchAria")}
             />
             {(searching || resolving) && (
               <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
@@ -240,7 +242,7 @@ export function LocationPicker({
             <div className="grid grid-cols-2 gap-3 rounded-md border bg-muted/20 p-3">
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">
-                  Latitude
+                  {t("report.latitude")}
                 </Label>
                 <Input
                   type="number"
@@ -259,7 +261,7 @@ export function LocationPicker({
               </div>
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">
-                  Longitude
+                  {t("report.longitude")}
                 </Label>
                 <Input
                   type="number"

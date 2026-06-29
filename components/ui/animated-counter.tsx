@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useFormatters } from "@/lib/i18n/provider";
+
 interface AnimatedCounterProps {
   value: number;
   durationMs?: number;
@@ -14,6 +16,7 @@ export function AnimatedCounter({
   durationMs = 900,
   decimals = 0,
 }: AnimatedCounterProps) {
+  const { formatNumber } = useFormatters();
   const [display, setDisplay] = useState(0);
   const raf = useRef<number | null>(null);
 
@@ -39,6 +42,8 @@ export function AnimatedCounter({
   }, [value, durationMs]);
 
   const shown =
-    decimals > 0 ? display.toFixed(decimals) : Math.round(display).toString();
+    decimals > 0
+      ? display.toFixed(decimals)
+      : formatNumber(Math.round(display));
   return <span className="tabular-nums">{shown}</span>;
 }

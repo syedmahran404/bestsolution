@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getReporterId } from "@/lib/reporter";
+import { useT, useFormatters } from "@/lib/i18n/provider";
 import type { CivicReport } from "@/types";
 
 /**
@@ -18,6 +19,8 @@ import type { CivicReport } from "@/types";
  * device and fetches only that reporter's reports — never the global list.
  */
 export function MyReportsList() {
+  const t = useT();
+  const { formatNumber } = useFormatters();
   const [reports, setReports] = useState<CivicReport[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,8 +50,8 @@ export function MyReportsList() {
     return (
       <EmptyState
         illustration="error"
-        title="Couldn't load your reports"
-        description="Something went wrong. Please try again later."
+        title={t("reports.errorTitle")}
+        description={t("reports.errorDesc")}
       />
     );
   }
@@ -67,11 +70,11 @@ export function MyReportsList() {
     return (
       <EmptyState
         illustration="reports"
-        title="No reports yet"
-        description="Reports you submit from this device will appear here."
+        title={t("reports.emptyTitle")}
+        description={t("reports.emptyDesc")}
         action={
           <Button asChild>
-            <Link href="/report">Report an issue</Link>
+            <Link href="/report">{t("nav.report")}</Link>
           </Button>
         }
       />
@@ -87,22 +90,28 @@ export function MyReportsList() {
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/12 text-brand">
             <Award className="h-5 w-5" />
           </span>
-          <p className="font-medium">Your civic impact</p>
+          <p className="font-medium">{t("reports.impactHeading")}</p>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-metric !text-2xl">{reports.length}</p>
-            <p className="text-xs text-muted-foreground">Reports filed</p>
+            <p className="text-metric !text-2xl">{formatNumber(reports.length)}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("reports.impactFiled")}
+            </p>
           </div>
           <div>
             <p className="text-metric !text-2xl text-brand">
-              {reports.length * 10}
+              {formatNumber(reports.length * 10)}
             </p>
-            <p className="text-xs text-muted-foreground">Civic points</p>
+            <p className="text-xs text-muted-foreground">
+              {t("reports.impactPoints")}
+            </p>
           </div>
           <div>
-            <p className="text-metric !text-2xl">{resolvedCount}</p>
-            <p className="text-xs text-muted-foreground">Resolved</p>
+            <p className="text-metric !text-2xl">{formatNumber(resolvedCount)}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("reports.impactResolved")}
+            </p>
           </div>
         </div>
       </Reveal>

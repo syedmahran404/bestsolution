@@ -25,7 +25,7 @@ export function NavLinks() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <nav aria-label="Primary" className="flex items-center gap-1">
+    <nav aria-label={t("nav.primary")} className="flex items-center gap-1">
       {ITEMS.map((it) => {
         const active = isActive(it.href);
         return (

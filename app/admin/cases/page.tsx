@@ -6,6 +6,7 @@ import { CaseFilters } from "@/components/admin/case-filters";
 import { EmptyState } from "@/components/brand";
 import { listCivicCases } from "@/lib/civic-cases";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
+import { getServerT } from "@/lib/i18n/server";
 import type { CivicCase } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ export const metadata = { title: "Civic Case Management — Velora Civic AI" };
 
 /** Phase 5 — Civic case management with search & filters. */
 export default async function AdminCasesPage() {
+  const t = getServerT();
   let cases: CivicCase[] = [];
   if (isFirebaseAdminConfigured) {
     try {
@@ -33,22 +35,21 @@ export default async function AdminCasesPage() {
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          Operations Center
+          {t("common.operationsCenter")}
         </Link>
 
         <div className="space-y-1">
-          <h1 className="text-h1">Civic Case Management</h1>
+          <h1 className="text-h1">{t("adminCases.title")}</h1>
           <p className="text-sm text-muted-foreground">
-            Search and filter civic cases. Open a case to inspect reports, AI
-            analysis, and manage its status.
+            {t("adminCases.subtitle")}
           </p>
         </div>
 
         {!isFirebaseAdminConfigured ? (
           <EmptyState
             illustration="offline"
-            title="Backend not configured"
-            description="Set FIREBASE_SERVICE_ACCOUNT_KEY to load civic cases."
+            title={t("admin.notConfiguredTitle")}
+            description={t("adminCases.notConfiguredDesc")}
           />
         ) : (
           <CaseFilters cases={cases} />

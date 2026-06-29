@@ -1,6 +1,7 @@
 import { Map as MapIcon } from "lucide-react";
 
 import { CivicMap } from "@/components/map/civic-map";
+import { getServerT } from "@/lib/i18n/server";
 import type { CivicMapMarker } from "@/types";
 
 /**
@@ -8,9 +9,10 @@ import type { CivicMapMarker } from "@/types";
  * civic map as a first-class command-center surface with a framed header.
  */
 export function OpsMap({ markers }: { markers: CivicMapMarker[] }) {
+  const t = getServerT();
   return (
     <section
-      aria-label="Operations map"
+      aria-label={t("ops.operationsMap")}
       className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-elev-1"
     >
       <header className="flex items-center justify-between border-b border-border/70 px-4 py-3">

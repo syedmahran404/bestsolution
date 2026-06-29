@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 
 import { MetricCard } from "@/components/brand";
+import { formatNumber } from "@/lib/i18n/format";
+import { getServerLocale, getServerT } from "@/lib/i18n/server";
 
 interface ExecutiveMetricsProps {
   criticalCount: number;
@@ -24,6 +26,8 @@ export function ExecutiveMetrics({
   avgResolutionHours,
   dailyActive,
 }: ExecutiveMetricsProps) {
+  const t = getServerT();
+  const locale = getServerLocale();
   const cards: {
     label: string;
     value: string;
@@ -32,31 +36,34 @@ export function ExecutiveMetrics({
     accent: Accent;
   }[] = [
     {
-      label: "Critical / high",
-      value: String(criticalCount),
+      label: t("exec.criticalHigh"),
+      value: formatNumber(criticalCount, locale),
       icon: Flame,
-      hint: "Elevated-priority cases",
+      hint: t("exec.criticalHint"),
       accent: "critical",
     },
     {
-      label: "Resolution rate",
+      label: t("exec.resolutionRate"),
       value: `${Math.round(resolutionRate * 100)}%`,
       icon: CheckCircle2,
-      hint: "Resolved / total",
+      hint: t("exec.resolutionRateHint"),
       accent: "success",
     },
     {
-      label: "Avg resolution",
-      value: avgResolutionHours === null ? "—" : `${avgResolutionHours}h`,
+      label: t("exec.avgResolution"),
+      value:
+        avgResolutionHours === null
+          ? "—"
+          : `${formatNumber(avgResolutionHours, locale)}h`,
       icon: Timer,
-      hint: "Create → resolved",
+      hint: t("exec.avgResolutionHint"),
       accent: "info",
     },
     {
-      label: "Active today",
-      value: String(dailyActive),
+      label: t("exec.activeToday"),
+      value: formatNumber(dailyActive, locale),
       icon: Activity,
-      hint: "Cases updated (24h)",
+      hint: t("exec.activeTodayHint"),
       accent: "brand",
     },
   ];

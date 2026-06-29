@@ -31,6 +31,20 @@ export function LanguagePicker() {
     }
   }, []);
 
+  // Keyboard dismissal: Escape accepts the current/default locale and closes,
+  // so keyboard-only users are never trapped in the first-launch modal.
+  useEffect(() => {
+    if (!show) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setLocale(locale);
+        setShow(false);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [show, locale, setLocale]);
+
   if (!show) return null;
 
   function choose(code: Locale) {
@@ -43,9 +57,9 @@ export function LanguagePicker() {
       role="dialog"
       aria-modal="true"
       aria-label={t("lang.choose")}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="animate-fade-in fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
     >
-      <div className="w-full max-w-md rounded-xl border bg-card p-6 text-card-foreground shadow-elevated">
+      <div className="animate-scale-in w-full max-w-md rounded-xl border bg-card p-6 text-card-foreground shadow-elevated">
         <div className="mb-4 flex flex-col items-center text-center">
           <div className="bg-gradient-brand mb-3 flex h-11 w-11 items-center justify-center rounded-lg text-brand-foreground shadow-sm">
             <Globe className="h-5 w-5" />

@@ -5,6 +5,7 @@ import { ImagePlus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useT } from "@/lib/i18n/provider";
 
 interface ImageFieldProps {
   /** Called whenever the selected image changes (null when cleared). */
@@ -13,6 +14,7 @@ interface ImageFieldProps {
 
 /** Photo upload field with a local preview. */
 export function ImageField({ onImageChange }: ImageFieldProps) {
+  const t = useT();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function ImageField({ onImageChange }: ImageFieldProps) {
     <div className="space-y-2">
       <div className="flex items-center gap-1.5">
         <ImagePlus className="h-4 w-4 text-muted-foreground" />
-        <Label>Photo (optional)</Label>
+        <Label>{t("report.photo")}</Label>
       </div>
 
       {previewUrl ? (
@@ -39,7 +41,7 @@ export function ImageField({ onImageChange }: ImageFieldProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl}
-            alt="Selected report"
+            alt={t("report.photoAlt")}
             className="h-24 w-24 rounded-md border object-cover"
           />
           <Button
@@ -47,7 +49,7 @@ export function ImageField({ onImageChange }: ImageFieldProps) {
             variant="ghost"
             size="icon"
             onClick={() => setImage(null)}
-            aria-label="Remove photo"
+            aria-label={t("report.removePhoto")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -55,7 +57,7 @@ export function ImageField({ onImageChange }: ImageFieldProps) {
       ) : (
         <label className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground hover:bg-muted/50">
           <ImagePlus className="h-5 w-5" />
-          <span>Click to upload a photo</span>
+          <span>{t("report.uploadPhoto")}</span>
           <input
             type="file"
             accept="image/*"

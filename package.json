@@ -7,11 +7,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && npm run check:i18n",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.ts",
-    "check:gemini": "node scripts/check-gemini.mjs"
+    "check:gemini": "node scripts/check-gemini.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

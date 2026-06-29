@@ -48,7 +48,10 @@ export default function OpengraphImage() {
           V
         </div>
         <div style={{ fontSize: 40, fontWeight: 600, opacity: 0.85 }}>
-          Velora Civic AI
+          {
+            // i18n-exempt — brand wordmark on static social/OG card
+            "Velora Civic AI"
+          }
         </div>
       </div>
       <div
@@ -60,7 +63,10 @@ export default function OpengraphImage() {
           maxWidth: 1000,
         }}
       >
-        AI Civic Operations Center
+        {
+          // i18n-exempt — brand marketing headline on static social/OG card
+          "AI Civic Operations Center"
+        }
       </div>
       <div
         style={{
@@ -70,7 +76,10 @@ export default function OpengraphImage() {
           maxWidth: 960,
         }}
       >
-        From issue reporting to issue resolution.
+        {
+          // i18n-exempt — brand marketing tagline on static social/OG card
+          "From issue reporting to issue resolution."
+        }
       </div>
     </div>,
     { ...size },

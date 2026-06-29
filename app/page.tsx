@@ -17,6 +17,7 @@ import { computeCivicHealthOverview } from "@/lib/civic-health";
 import { generateCivicInsights } from "@/lib/civic-insights";
 import { listCivicCases } from "@/lib/civic-cases";
 import { isFirebaseAdminConfigured } from "@/lib/firebase/admin";
+import { getServerT } from "@/lib/i18n/server";
 import { SEED_ISSUES } from "@/lib/seed-data";
 import type { CivicCase, CivicMapMarker } from "@/types";
 
@@ -31,6 +32,7 @@ export const dynamic = "force-dynamic";
  * legend still work.
  */
 export default async function HomePage() {
+  const t = getServerT();
   let cases: CivicCase[] = [];
   if (isFirebaseAdminConfigured) {
     try {
@@ -89,24 +91,21 @@ export default async function HomePage() {
         <section className="animate-fade-in-up hero-surface overflow-hidden rounded-2xl border border-border/70 p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl space-y-2.5">
-              <Badge variant="brand">AI Civic Intelligence</Badge>
+              <Badge variant="brand">{t("home.badge")}</Badge>
               <h1 className="text-h1">
-                India{" "}
-                <span className="text-gradient-brand">Civic Operations</span>{" "}
-                Center
+                <span className="text-gradient-brand">{t("home.title")}</span>
               </h1>
               <p className="text-sm text-muted-foreground sm:text-base">
-                Citizens report issues; AI aggregates them into prioritized
-                civic cases — explained, tracked, and resolved.
-                {!usingLiveData && " (Showing demo data.)"}
+                {t("home.subtitle")}
+                {!usingLiveData && ` ${t("common.demoData")}`}
               </p>
             </div>
             <div className="flex shrink-0 gap-2">
               <Button asChild variant="brand">
-                <Link href="/report">Report an issue</Link>
+                <Link href="/report">{t("home.ctaReport")}</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/admin">Operations center</Link>
+                <Link href="/admin">{t("home.ctaOps")}</Link>
               </Button>
             </div>
           </div>
@@ -128,7 +127,7 @@ export default async function HomePage() {
             className="grid grid-cols-1 gap-4 lg:grid-cols-3"
           >
             <div className="space-y-3 lg:col-span-2">
-              <SectionHeader title="Explainable civic insights" />
+              <SectionHeader title={t("home.insights")} />
               {insights.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {insights.map((ins) => (
@@ -137,12 +136,12 @@ export default async function HomePage() {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Insights appear as more reports arrive.
+                  {t("home.insightsEmpty")}
                 </p>
               )}
             </div>
             <div className="space-y-3">
-              <SectionHeader title="Distribution" />
+              <SectionHeader title={t("home.distribution")} />
               <CategoryDistribution cases={cases} />
             </div>
           </Reveal>
@@ -151,7 +150,7 @@ export default async function HomePage() {
         {/* Civic cases */}
         {usingLiveData && (
           <Reveal as="section" className="space-y-3">
-            <SectionHeader title="Civic cases" />
+            <SectionHeader title={t("home.cases")} />
             <div className="space-y-3">
               {cases.slice(0, 10).map((c) => (
                 <div key={c.id} className="card-hover rounded-lg">
@@ -167,11 +166,14 @@ export default async function HomePage() {
         <div className="container flex flex-col items-center justify-between gap-2 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
           <span>
             <span className="font-display font-semibold text-foreground">
-              Velora Civic AI
+              {
+                // i18n-exempt — brand wordmark
+                "Velora Civic AI"
+              }
             </span>{" "}
-            · AI Civic Operations Center
+            · {t("brand.tagline")}
           </span>
-          <span>Built for the Vibe2Ship Hackathon</span>
+          <span>{t("home.builtFor")}</span>
         </div>
       </footer>
     </div>

@@ -3,6 +3,7 @@ import { HeartPulse } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendBadge } from "@/components/health/trend-badge";
 import { TrustBadges } from "@/components/trust/trust-badges";
+import { getServerT } from "@/lib/i18n/server";
 import type { CivicHealthOverview } from "@/lib/civic-health";
 import type { HealthScore } from "@/types";
 
@@ -15,6 +16,7 @@ function scoreHex(score: number): string {
 
 /** Circular score gauge using a conic-gradient ring (no chart dependency). */
 function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
+  const t = getServerT();
   const hex = scoreHex(score);
   return (
     <div
@@ -33,7 +35,7 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
           {score}
         </span>
         <span className="text-[10px] uppercase text-muted-foreground">
-          / 100
+          {t("health.outOf100")}
         </span>
       </div>
     </div>
@@ -69,6 +71,7 @@ function MiniScore({ item }: { item: HealthScore }) {
  * explainable factor list.
  */
 export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
+  const t = getServerT();
   const { city, categories, wards } = overview;
 
   return (
@@ -77,7 +80,7 @@ export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-1.5 text-base">
             <HeartPulse className="h-4 w-4" />
-            Civic Health Index
+            {t("health.title")}
           </CardTitle>
           <TrustBadges
             mode="deterministic"
@@ -93,7 +96,7 @@ export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
           <ScoreRing score={city.score} />
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <p className="text-lg font-semibold">City Health</p>
+              <p className="text-lg font-semibold">{t("health.cityHealth")}</p>
               <TrendBadge trend={city.trend} />
             </div>
             <p className="text-sm text-muted-foreground">{city.trendReason}</p>
@@ -112,7 +115,7 @@ export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
         {categories.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">
-              By category
+              {t("health.byCategory")}
             </p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
               {categories.map((c) => (
@@ -125,7 +128,7 @@ export function HealthIndex({ overview }: { overview: CivicHealthOverview }) {
         {wards.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">
-              By ward / locality
+              {t("health.byWard")}
             </p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
               {wards.map((w) => (

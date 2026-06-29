@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HeartHandshake } from "lucide-react";
 
 import { Celebration } from "@/components/motion/celebration";
+import { useT } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
  * turning the end of the report flow into a memorable, encouraging beat.
  */
 export function ReportSubmitted({ voiceCount }: { voiceCount: number }) {
+  const t = useT();
   const [celebrate, setCelebrate] = useState(true);
 
   const ordinal =
@@ -44,7 +46,7 @@ export function ReportSubmitted({ voiceCount }: { voiceCount: number }) {
         </span>
         <div className="space-y-0.5">
           <p className="font-display text-base font-semibold text-foreground">
-            Your report mattered
+            {t("report.submittedTitle")}
           </p>
           <p className="text-sm text-muted-foreground">
             {aggregated

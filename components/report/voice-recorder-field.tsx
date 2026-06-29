@@ -6,6 +6,7 @@ import { Mic, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useT } from "@/lib/i18n/provider";
 
 // Open-source recorder. Loaded client-side only (uses MediaRecorder / browser
 // APIs that are unavailable during SSR).
@@ -25,6 +26,7 @@ interface VoiceRecorderFieldProps {
  * build a custom recorder (per Phase 2 spec).
  */
 export function VoiceRecorderField({ onAudioChange }: VoiceRecorderFieldProps) {
+  const t = useT();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Revoke object URLs on change/unmount to avoid memory leaks.
@@ -48,7 +50,7 @@ export function VoiceRecorderField({ onAudioChange }: VoiceRecorderFieldProps) {
     <div className="space-y-2">
       <div className="flex items-center gap-1.5">
         <Mic className="h-4 w-4 text-muted-foreground" />
-        <Label>Voice note (optional)</Label>
+        <Label>{t("report.voice")}</Label>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 rounded-md border bg-muted/30 p-3">
@@ -58,10 +60,10 @@ export function VoiceRecorderField({ onAudioChange }: VoiceRecorderFieldProps) {
           showVisualizer
         />
 
-        <span className="text-xs text-muted-foreground">or</span>
+        <span className="text-xs text-muted-foreground">{t("common.or")}</span>
 
         <label className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline">
-          Upload audio file
+          {t("report.uploadAudio")}
           <input
             type="file"
             accept="audio/*"
@@ -82,7 +84,7 @@ export function VoiceRecorderField({ onAudioChange }: VoiceRecorderFieldProps) {
             variant="ghost"
             size="icon"
             onClick={() => setAudio(null)}
-            aria-label="Remove audio"
+            aria-label={t("report.removeAudio")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

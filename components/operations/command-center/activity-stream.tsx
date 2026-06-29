@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 
 import { CATEGORY_META } from "@/lib/constants";
+import { formatRelativeTime } from "@/lib/i18n/format";
+import { getServerLocale, getServerT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 import type { CivicCase, IssueStatus } from "@/types";
 
@@ -36,15 +38,8 @@ const EVENT: Record<
   },
 };
 
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.round(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.round(h / 24);
-  return `${d}d ago`;
+function timeAgo(iso: string, locale: ReturnType<typeof getServerLocale>): string {
+  return formatRelativeTime(iso, locale);
 }
 
 export function ActivityStream({
@@ -54,22 +49,24 @@ export function ActivityStream({
   cases: CivicCase[];
   limit?: number;
 }) {
+  const locale = getServerLocale();
+  const t = getServerT();
   const events = [...cases]
     .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
     .slice(0, limit);
 
   return (
     <section
-      aria-label="Live activity"
+      aria-label={t("ops.liveActivity")}
       className="rounded-xl border border-border/70 bg-card shadow-elev-1"
     >
       <header className="border-b border-border/70 px-4 py-3">
-        <h2 className="text-h3">Live activity</h2>
+        <h2 className="text-h3">{t("ops.liveActivity")}</h2>
       </header>
 
       {events.length === 0 ? (
         <p className="px-4 py-6 text-sm text-muted-foreground">
-          No recent activity.
+          {t("ops.noRecentActivity")}
         </p>
       ) : (
         <ol className="relative space-y-0 p-2">
@@ -107,7 +104,7 @@ export function ActivityStream({
                   </Link>
                   <p className="text-xs text-muted-foreground">
                     {c.locality ? `${c.locality} · ` : ""}
-                    {timeAgo(c.updatedAt)}
+                    {timeAgo(c.updatedAt, locale)}
                   </p>
                 </div>
               </li>
